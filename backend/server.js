@@ -11,7 +11,7 @@ const express = require('express'),
       {resolvers: mapResolver, typeDefs: mapTypeDefs} = require('./resolvers/map-resolver'),
       {authenticateUser, revokeTokens, refreshToken, deleteToken} = require('./auth'),
       bodyParser = require('body-parser'),
-      cookieParser = require("cookie-parser");
+      cookieParser = require("cookie-parser"),
       serviceAccount = config;
 
 admin.initializeApp(serviceAccount);
