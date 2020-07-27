@@ -16,22 +16,22 @@ const express = require('express'),
 
 admin.initializeApp(serviceAccount);
 
-// let whitelist = ['http://localhost:3000', 'http://localhost:4200', 'http://localhost:3000/graphql' ];
-// let corsOptions = {
-//     origin: function (origin, callback) {
-//       if (whitelist.indexOf(origin) !== -1) {
-//         callback(null, true)
-//       } else {
-//         callback(new Error('Not allowed by CORS'))
-//       }
-//     },
-//     credentials: true
-// }
+let whitelist = ['http://localhost:3000', 'http://localhost:3000/graphql' ];
+let corsOptions = {
+    origin: function (origin, callback) {
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
+    credentials: true
+}
 
 //integrating graphql settings
 const apolloServer = new ApolloServer({
     typeDefs: [typeDefs, userTypeDefs, mapTypeDefs], 
-    // resolvers: merge(resolvers, userResolver, mapResolver),
+    resolvers: merge(resolvers, userResolver, mapResolver),
     context: ({ req, res }) => ({ req, res })
 });
 
@@ -39,7 +39,7 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(authenticateUser);
-app.use(cors());
+app.use(cors(corsOptions));
 
 apolloServer.applyMiddleware({ 
     app,
