@@ -1,32 +1,27 @@
 const express = require('express'),
       app = express(),
       cors = require('cors'),
-      {merge} = require('lodash'),
-      { config } = require('./config/config.js'),
       server = require('http').createServer(app),
-      admin = require("firebase-admin"),
-      {ApolloServer} = require('apollo-server-express'),
-      {resolvers, typeDefs} = require('./resolvers/resolver'),
-      {resolvers: userResolver, typeDefs: userTypeDefs} = require('./resolvers/user-resolver'),
-      {resolvers: mapResolver, typeDefs: mapTypeDefs} = require('./resolvers/map-resolver'),
-      {authenticateUser, revokeTokens, refreshToken, deleteToken} = require('./auth'),
+      { merge } = require('lodash'),
+      { ApolloServer } = require('apollo-server-express'),
+      { resolvers, typeDefs } = require('./resolvers/resolver'),
+      { resolvers: userResolver, typeDefs: userTypeDefs } = require('./resolvers/user-resolver'),
+      { resolvers: mapResolver, typeDefs: mapTypeDefs } = require('./resolvers/map-resolver'),
+      { authenticateUser, revokeTokens, refreshToken, deleteToken } = require('./auth'),
       bodyParser = require('body-parser'),
-      cookieParser = require("cookie-parser"),
-      serviceAccount = config;
+      cookieParser = require("cookie-parser");
 
-admin.initializeApp(serviceAccount);
-
-let whitelist = ['http://localhost:3000', 'http://localhost:3000/graphql' ];
-let corsOptions = {
-    origin: function (origin, callback) {
-      if (whitelist.indexOf(origin) !== -1) {
-        callback(null, true)
-      } else {
-        callback(new Error('Not allowed by CORS'))
-      }
-    },
-    credentials: true
-}
+// let whitelist = ['http://localhost:3000', 'https://localhost:3000/graphql' ];
+// let corsOptions = {
+//     origin: function (origin, callback) {
+//       if (whitelist.indexOf(origin) !== -1) {
+//         callback(null, true)
+//       } else {
+//         callback(new Error('Not allowed by CORS'))
+//       }
+//     },
+//     credentials: true
+// }
 
 //integrating graphql settings
 const apolloServer = new ApolloServer({
@@ -39,7 +34,7 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(authenticateUser);
-app.use(cors(corsOptions));
+app.use(cors());
 
 apolloServer.applyMiddleware({ 
     app,

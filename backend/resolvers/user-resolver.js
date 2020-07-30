@@ -1,12 +1,11 @@
-const { hash, genSalt, compareSync } = require('bcrypt'),
-      { createAccessToken, createRefreshToken } = require('../auth');
-
+const { createAccessToken, createRefreshToken } = require('../auth'),
+      db = require('../db');
 //graphql schema
 //Query schema
 //Mutation Schema
 const typeDefs = `
     extend type Query {
-        login(email: String!, password: String!): LoginResponse!
+        login(username: String!, password: String!): LoginResponse!
     }
 
     extend type Mutation {
@@ -16,7 +15,6 @@ const typeDefs = `
     type LoginResponse {
         response_type: String!
         response: String!
-        email: String!
         username: String!
         accessToken: String!
     }
@@ -26,25 +24,63 @@ const typeDefs = `
 const resolvers = {
     //Returns data from queries
     Query: {
-        login: async(_, { email, password }, {res}) => {
-            return {
-                response_type: ``,
-                response: ``,
-                email: ``,
-                username: ``,
-                accessToken: ``
+        login: async(_, { username, password }, {res}) => {
+            try {
+                let response = await db.login(username, password);
+
+                res.cookie('jid', createRefreshToken(username, response[1]), {
+                    maxAge: 7 * 24 * 60 * 60 * 1000, // 7days 24hours 60minutes 60secs 1000ms
+                    httpOnly: true,
+                    secure: true
+                    
+                });
+
+                if(response[0]){
+                    return {
+                        response_type: `Success`,
+                        response: `Login Successful`,
+                        username: `${username}`,
+                        accessToken: `${createAccessToken(username, response[1])}`
+                    }
+                };
+            } catch (error) {
+                return {
+                    response_type: error.toString().split(":")[0].replace(" ",""),
+                    response: error.toString().split(":")[1].replace(" ",""),
+                    username: ``,
+                    accessToken: ``
+                }
             }
         }
     },
     //Mutations make changes to the database
     Mutation: {
         register: async(_, { username, f_name, l_name, email, password }, {res}) => {
-            return {
-                response_type: ``,
-                response: ``,
-                email: ``,
-                username: ``,
-                accessToken: ``
+            try {
+                let response = await db.register(username, f_name, l_name, email, password);
+
+                res.cookie('jid', createRefreshToken(username, response[1]), {
+                    maxAge: 7 * 24 * 60 * 60 * 1000, // 7days 24hours 60minutes 60secs 1000ms
+                    httpOnly: true,
+                    secure: true
+                    
+                });
+
+                if(response[0]){
+                    return {
+                        response_type: `Success`,
+                        response: `Registration Successful`,
+                        username: `${username}`,
+                        accessToken: `${createAccessToken(username, response[1])}`
+                    }
+                };
+            } catch (error) {
+                return {
+                    response_type: error.toString().split(":")[0].replace(" ",""),
+                    response: error.toString().split(":")[1].replace(" ",""),
+                    username: ``,
+                    accessToken: ``
+                }
             }
         }
     }
