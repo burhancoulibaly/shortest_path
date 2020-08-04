@@ -1,12 +1,12 @@
 const { sign, verify } = require('jsonwebtoken'),
       db = require('./db');
 
-const createAccessToken = (username, tokenVersion) => {
-    return sign({ username: username, tokenVersion: tokenVersion }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1s" });
+const createAccessToken = (username, tokenVersion, role) => {
+    return sign({ username: username, tokenVersion: tokenVersion, role: role }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
 }
 
-const createRefreshToken = (username, tokenVersion) => {
-    return sign({ username: username, tokenVersion: tokenVersion }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
+const createRefreshToken = (username, tokenVersion, role) => {
+    return sign({ username: username, tokenVersion: tokenVersion, role: role }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
 }
 
 //All errors functions below return will be jwt token errors.
@@ -60,14 +60,14 @@ const refreshToken = async function(refreshToken, res){
         response = await db.refreshToken(payload);
 
 
-        res.cookie('jid', createRefreshToken(response[1], response[2]), {
+        res.cookie('jid', createRefreshToken(response[1], response[2], payload.role), {
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7days 24hours 60minutes 60secs 1000ms
             httpOnly: true,
             secure: true
             
         });
 
-        response[0].accessToken = createAccessToken(response[1], response[2]);
+        response[0].accessToken = createAccessToken(response[1], response[2], payload.role);
 
         return response[0];
     } catch (error) {

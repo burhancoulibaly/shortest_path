@@ -9,13 +9,14 @@ const typeDefs = `
     }
 
     extend type Mutation {
-        register(username: String!, f_name: String!, l_name: String!, email: String!, password: String!): LoginResponse!
+        register(username: String!, email: String!, password: String!): LoginResponse!
     }
 
     type LoginResponse {
         response_type: String!
         response: String!
         username: String!
+        role: String!
         accessToken: String!
     }
 `;
@@ -24,23 +25,41 @@ const typeDefs = `
 const resolvers = {
     //Returns data from queries
     Query: {
-        login: async(_, { username, password }, {res}) => {
+        login: async(_, { username, password }, {res, req}) => {
             try {
                 let response = await db.login(username, password);
 
-                res.cookie('jid', createRefreshToken(username, response[1]), {
-                    maxAge: 7 * 24 * 60 * 60 * 1000, // 7days 24hours 60minutes 60secs 1000ms
-                    httpOnly: true,
-                    secure: true
-                    
-                });
-
                 if(response[0]){
+                    if(!password){
+                        res.cookie('jid', createRefreshToken(username, response[1], "guest"), {
+                            maxAge: 7 * 24 * 60 * 60 * 1000, // 7days 24hours 60minutes 60secs 1000ms
+                            httpOnly: true,
+                            secure: true
+                            
+                        });
+
+                        return {
+                            response_type: `Success`,
+                            response: `Login Successful`,
+                            username: `${username}`,
+                            role: `guest`,
+                            accessToken: `${createAccessToken(username, response[1], "guest")}`
+                        }
+                    }
+
+                    res.cookie('jid', createRefreshToken(username, response[1], "authenticated"), {
+                        maxAge: 7 * 24 * 60 * 60 * 1000, // 7days 24hours 60minutes 60secs 1000ms
+                        httpOnly: true,
+                        secure: true
+                        
+                    });
+
                     return {
                         response_type: `Success`,
                         response: `Login Successful`,
                         username: `${username}`,
-                        accessToken: `${createAccessToken(username, response[1])}`
+                        role: `authenticated`,
+                        accessToken: `${createAccessToken(username, response[1], "authenticated")}`
                     }
                 };
             } catch (error) {
@@ -48,6 +67,7 @@ const resolvers = {
                     response_type: error.toString().split(":")[0].replace(" ",""),
                     response: error.toString().split(":")[1].replace(" ",""),
                     username: ``,
+                    role: ``,
                     accessToken: ``
                 }
             }
@@ -59,7 +79,7 @@ const resolvers = {
             try {
                 let response = await db.register(username, f_name, l_name, email, password);
 
-                res.cookie('jid', createRefreshToken(username, response[1]), {
+                res.cookie('jid', createRefreshToken(username, response[1], "authenticated"), {
                     maxAge: 7 * 24 * 60 * 60 * 1000, // 7days 24hours 60minutes 60secs 1000ms
                     httpOnly: true,
                     secure: true
@@ -71,7 +91,8 @@ const resolvers = {
                         response_type: `Success`,
                         response: `Registration Successful`,
                         username: `${username}`,
-                        accessToken: `${createAccessToken(username, response[1])}`
+                        role: `authenticated`,
+                        accessToken: `${createAccessToken(username, response[1], "authenticated")}`
                     }
                 };
             } catch (error) {
@@ -79,6 +100,7 @@ const resolvers = {
                     response_type: error.toString().split(":")[0].replace(" ",""),
                     response: error.toString().split(":")[1].replace(" ",""),
                     username: ``,
+                    role: ``,
                     accessToken: ``
                 }
             }

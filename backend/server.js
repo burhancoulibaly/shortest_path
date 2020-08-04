@@ -11,17 +11,17 @@ const express = require('express'),
       bodyParser = require('body-parser'),
       cookieParser = require("cookie-parser");
 
-// let whitelist = ['http://localhost:3000', 'https://localhost:3000/graphql' ];
-// let corsOptions = {
-//     origin: function (origin, callback) {
-//       if (whitelist.indexOf(origin) !== -1) {
-//         callback(null, true)
-//       } else {
-//         callback(new Error('Not allowed by CORS'))
-//       }
-//     },
-//     credentials: true
-// }
+let whitelist = ['http://localhost:3000', 'https://localhost:3000/graphql', 'http://localhost:4200'];
+let corsOptions = {
+    origin: function (origin, callback) {
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
+    credentials: true
+}
 
 //integrating graphql settings
 const apolloServer = new ApolloServer({
@@ -30,7 +30,7 @@ const apolloServer = new ApolloServer({
     context: ({ req, res }) => ({ req, res })
 });
 
-app.use(cookieParser());
+app.use(cookieParser(corsOptions));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(authenticateUser);

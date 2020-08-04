@@ -22,6 +22,10 @@ function login(username, password){
             }else if(!password && !response){
                 return resolve([true, 0]);
             }
+
+            if(!response){
+                throw new Error("Invalid login");
+            }
     
             if (compareSync(password, response.password)){
                 return resolve([true, response.token_version]);
