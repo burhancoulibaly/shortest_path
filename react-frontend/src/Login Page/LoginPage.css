@@ -1,0 +1,62 @@
+#login-page {
+    height: 100vh;
+    background-color: gray;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#login-page .login-container {
+    width: 600px;
+    height: 500px;
+    background-color: white;
+    border-radius: 25px;
+}
+#login-page .login-container form {
+    height: 80%;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+#login-page .login-container .signup .password{
+    display: flex;
+    justify-content: space-around;
+}
+#login-page .login-container .signup .password .form-group{
+    width: 48%;
+
+}
+#login-page .login-container .hide {
+    display: none;
+}
+#login-page .login-container .login-options{
+    display: flex;
+    flex-direction: row;
+    height: 20%;
+}
+#login-page .login-container .login-options > button {
+    background-color: inherit;
+    width: 34%;
+    border: 1px solid #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0;
+}
+#login-page .login-container .login-options > button:nth-child(1),
+#login-page .login-container .login-options > button:nth-child(1):hover {
+    border-bottom-left-radius: 25px;
+}
+#login-page .login-container .login-options > button:nth-child(3),
+#login-page .login-container .login-options > button:nth-child(3):hover {
+    border-bottom-right-radius: 25px;
+}
+#login-page .login-container .login-options > button:hover {
+    background-color: #eee;
+}
+#login-page .login-container .login-options > button.active {
+    background-color: #ddd;
+}
+#login-page .error {
+    color: red;
+}
