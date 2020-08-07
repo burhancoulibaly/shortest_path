@@ -10,6 +10,7 @@ const typeDefs = `
 
     extend type Mutation {
         register(username: String!, email: String!, password: String!): LoginResponse!
+        guest(username: String!): LoginResponse!
     }
 
     type LoginResponse {
@@ -30,23 +31,6 @@ const resolvers = {
                 let response = await db.login(username, password);
 
                 if(response[0]){
-                    if(!password){
-                        res.cookie('jid', createRefreshToken(username, response[1], "guest"), {
-                            maxAge: 7 * 24 * 60 * 60 * 1000, // 7days 24hours 60minutes 60secs 1000ms
-                            httpOnly: true,
-                            secure: true
-                            
-                        });
-
-                        return {
-                            response_type: `Success`,
-                            response: `Login Successful`,
-                            username: `${username}`,
-                            role: `guest`,
-                            accessToken: `${createAccessToken(username, response[1], "guest")}`
-                        }
-                    }
-
                     res.cookie('jid', createRefreshToken(username, response[1], "authenticated"), {
                         maxAge: 7 * 24 * 60 * 60 * 1000, // 7days 24hours 60minutes 60secs 1000ms
                         httpOnly: true,
@@ -75,9 +59,9 @@ const resolvers = {
     },
     //Mutations make changes to the database
     Mutation: {
-        register: async(_, { username, f_name, l_name, email, password }, {res}) => {
+        register: async(_, { username, email, password }, {res}) => {
             try {
-                let response = await db.register(username, f_name, l_name, email, password);
+                let response = await db.register(username, email, password);
 
                 res.cookie('jid', createRefreshToken(username, response[1], "authenticated"), {
                     maxAge: 7 * 24 * 60 * 60 * 1000, // 7days 24hours 60minutes 60secs 1000ms
@@ -95,6 +79,36 @@ const resolvers = {
                         accessToken: `${createAccessToken(username, response[1], "authenticated")}`
                     }
                 };
+            } catch (error) {
+                return {
+                    response_type: error.toString().split(":")[0].replace(" ",""),
+                    response: error.toString().split(":")[1].replace(" ",""),
+                    username: ``,
+                    role: ``,
+                    accessToken: ``
+                }
+            }
+        },
+        guest: async(_, { username }, { res }) => {
+            try {
+                let response = await db.guest(username);
+
+                res.cookie('jid', createRefreshToken(username, response[1], "guest"), {
+                    maxAge: 7 * 24 * 60 * 60 * 1000, // 7days 24hours 60minutes 60secs 1000ms
+                    httpOnly: true,
+                    secure: true
+                    
+                });
+                
+                if(response[0]){
+                    return {
+                        response_type: `Success`,
+                        response: `Guest Login Successful`,
+                        username: `${username}`,
+                        role: `guest`,
+                        accessToken: `${createAccessToken(username, response[1], "guest")}`
+                    }
+                }
             } catch (error) {
                 return {
                     response_type: error.toString().split(":")[0].replace(" ",""),

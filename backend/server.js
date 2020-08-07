@@ -34,7 +34,7 @@ app.use(cookieParser(corsOptions));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(authenticateUser);
-app.use(cors());
+app.use(cors(corsOptions));
 
 apolloServer.applyMiddleware({ 
     app,
@@ -75,7 +75,7 @@ app.get('/refreshToken', async(req, res) => {
 
 app.get('/deleteRefreshToken', async(req, res) => {
     try {
-        let response = await deleteToken(res);
+        let response = await deleteToken(req.cookies.jid, res);
 
         res.status(200).send(response);
         return;

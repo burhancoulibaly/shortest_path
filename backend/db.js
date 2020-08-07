@@ -1,4 +1,5 @@
-const resolver = require("./resolvers/resolver.js");
+const resolver = require("./resolvers/resolver.js"),
+      { sign, verify } = require('jsonwebtoken');
 
 const admin = require("firebase-admin"),
       { hash, genSalt, compareSync } = require('bcrypt'),
@@ -17,12 +18,6 @@ function login(username, password){
             let snapshot = await db.collection('login').doc(username).get();
             let response = snapshot.data();
 
-            if(!password && response){
-                throw new Error("Username already exist");
-            }else if(!password && !response){
-                return resolve([true, 0]);
-            }
-
             if(!response){
                 throw new Error("Invalid login");
             }
@@ -38,7 +33,32 @@ function login(username, password){
     });
 }
 
-function register(username, f_name, l_name, email, password){
+function guest(username){
+    return new Promise(async (resolve, reject) => {
+        try {
+            const tokenVersion = 0;
+
+            let userRef = db.collection('user').doc(username);
+            let response = (await userRef.get()).data();
+
+            if(response){
+                throw new Error("Account already exist");
+            }  
+
+            await userRef.set({
+                username: `${username}`,
+                role: "guest"
+            })
+
+            return resolve([true, tokenVersion]);
+        } catch (error) {
+            // console.log(error);
+            return reject(error);
+        }
+    })
+}
+
+function register(username, email, password){
     return new Promise(async (resolve, reject) => {
         try {
             const saltRounds = 12;
@@ -49,11 +69,18 @@ function register(username, f_name, l_name, email, password){
             let userRef = db.collection('user').doc(username);
             let loginRef = db.collection('login').doc(username);
 
+            let response = (await userRef.get()).data();
+
+            if(response){
+                throw new Error("Account already exist");
+            }
+
+            //add way for checking if email exist in db as well.
+
             await userRef.set({
                 email: `${email}`,
-                f_name: `${f_name}`,
-                l_name: `${l_name}`,
-                username: `${username}`
+                username: `${username}`,
+                role: "authenticated"
             })
 
             await loginRef.set({
@@ -68,9 +95,28 @@ function register(username, f_name, l_name, email, password){
     });
 }
 
-async function refreshToken(payload){
+async function refreshToken(refreshToken){
     return new Promise(async(resolve, reject) => {
         try{
+            payload = verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+            if(payload.role == "guest"){
+                let userSnapshot = await db.collection('user').doc(payload.username).get();
+                let userResponse = userSnapshot.data();
+
+                if(!userResponse){
+                    throw new Error("Invalid user");
+                }
+
+                return resolve([{ 
+                    response_type: `Token refresh`,
+                    response: "Success", 
+                    username: `${payload.username}`, 
+                    role: `${payload.role}`,
+                    accessToken: ``
+                }, payload.username, 0, payload.role]);//guest users dont have a tokenVersion saved,
+            }
+
             //Since token is valid a new accessToken is returned;
             let loginSnapshot = await db.collection('login').doc(payload.username).get();
             let loginResponse = loginSnapshot.data();
@@ -84,10 +130,12 @@ async function refreshToken(payload){
             }
             
             return resolve([{ 
-                response_type: `Token refreshed`, 
+                response_type: `Token refresh`,
+                response: "Success", 
                 username: `${payload.username}`, 
+                role: `${payload.role}`,
                 accessToken: ``
-            }, payload.username, loginResponse.token_version]);
+            }, payload.username, loginResponse.token_version, payload.role]);
         }catch(error){
             return reject({ 
                 response_type: error.toString().split(":")[0].replace(" ",""),
@@ -135,9 +183,44 @@ function revokeTokens(email){
     })
 }
 
+function cleanUserDB(refreshToken){
+    return new Promise(async(resolve, reject) => {
+        try{
+            payload = verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    
+            if(!payload){
+                throw new Error("Empty refresh token");
+            }
+    
+            if(payload.role == "guest"){
+                loginRef = await db.collection('login').doc(payload.username);
+                userRef = await db.collection('user').doc(payload.username);
+    
+                loginRef.delete();
+                userRef.delete();
+
+                return resolve({
+                    response_type: "Success",
+                    response: "Guest user removed from db"
+                });
+            }
+
+            return resolve({
+                response_type: "Success",
+                response: "User is not a guest user"
+            });
+    
+        }catch(error){
+            return reject(error);
+        }
+    });
+}
+
 module.exports = {
     login,
     register,
     revokeTokens,
-    refreshToken
+    refreshToken,
+    cleanUserDB,
+    guest
 }

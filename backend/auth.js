@@ -55,19 +55,17 @@ const authenticateUser = async (req, res, next) => {
 const refreshToken = async function(refreshToken, res){
     //refresh token logic here.
     try {
-        payload = verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-
-        response = await db.refreshToken(payload);
+        response = await db.refreshToken(refreshToken);
 
 
-        res.cookie('jid', createRefreshToken(response[1], response[2], payload.role), {
+        res.cookie('jid', createRefreshToken(response[1], response[2], response[3]), {
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7days 24hours 60minutes 60secs 1000ms
             httpOnly: true,
             secure: true
             
         });
 
-        response[0].accessToken = createAccessToken(response[1], response[2], payload.role);
+        response[0].accessToken = createAccessToken(response[1], response[2], response[3]);
 
         return response[0];
     } catch (error) {
@@ -86,10 +84,12 @@ const revokeTokens = async function(email){
     }
 }
 
-const deleteToken = function(res){
+const deleteToken = function(refreshToken, res){
     return new Promise(async(resolve, reject) => {
         //delete token logic here.
         try {
+            await db.cleanUserDB(refreshToken);
+
             res.clearCookie('jid');
 
             return resolve({
