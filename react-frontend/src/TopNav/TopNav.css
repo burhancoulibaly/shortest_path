@@ -1,0 +1,20 @@
+#topnav {
+    position: fixed;
+    height: 50px;
+    width: 100%;
+    color: white;
+    font-weight: thin;
+    background: #5a6268;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem;
+}
+#topnav .app-name{
+    font-size: 1rem;
+    margin: 0;
+}
+#topnav .user-dropdown .btn{
+    background: #5a6268;
+    border: none;
+}

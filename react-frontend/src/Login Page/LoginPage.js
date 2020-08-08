@@ -4,9 +4,9 @@ import AuthHelper from '../Auth Helpers/AuthHelper';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import { Redirect } from 'react-router-dom'
 import UserContext from "../UserContext";
-import axios from "axios";
 
-
+//Todo move this function to its own file
+//Returns login form based on login tab
 const LoginForm = (props) => {
   if(props.loginTab === "login"){
     return (
@@ -99,7 +99,8 @@ const LoginForm = (props) => {
                 username: e.target.form.elements[0].value,
               }
             },
-            e.preventDefault()
+            e.preventDefault(),
+            // console.log(`"${e.target.form.elements[0].value}"`,
             )
           }>Submit</button>
       </form>
@@ -107,7 +108,7 @@ const LoginForm = (props) => {
   }
 };
 
-function LoginPage() {
+function LoginPage(props) {
   //Login tab state variable
   const [user, setUser] = useContext(UserContext);
   const [loginTab, setLoginTab] = useState("login");
@@ -116,43 +117,15 @@ function LoginPage() {
   const [guest, { error: guestError, data: guestData }] = useMutation(AuthHelper.guest);
   const [signup, { error: signupError, data: signupData }] = useMutation(AuthHelper.signup);
 
-  //Onlu rerenders on changes
-  useEffect(() => {
-    const updateUser = (userData) => {
-      if(userData.response_type !== "Success" || !userData.response_type){
-        setUser(null);
-
-        return;
-      }
-
-      setUser({
-        username: userData.username,
-        role: userData.role,
-        accessToken: userData.accessToken
-      })
-  
-      return;
-    }
-
-    const logout = () => {
-      axios.get("http://localhost:3000/deleteRefreshToken")
-                .then((response) => {
-                    updateUser(response.data);
-    
-                    return;
-                })
-                .catch((error) => {
-                    console.log(error.data);
-                     return;
-                });
-    }
-
+  //Only rerenders on changes
+  useEffect(() => {  
+    // <--------------------------------GUEST--------------------------------> 
     if(guestError){
       console.log(guestError);
 
-      updateUser(guestError);
+      props.updateUser(guestError, setUser);
 
-      logout();
+      props.logout(setUser);
   
       setLoginState("system-error");
 
@@ -163,7 +136,7 @@ function LoginPage() {
       if(!guestData.guest.response_type.includes("Error")){
         // console.log(guestData.guest);
 
-        updateUser(guestData.guest);
+        props.updateUser(guestData.guest, setUser);
         
         setLoginState("success");
 
@@ -172,19 +145,22 @@ function LoginPage() {
   
       console.log(guestData);
 
-      updateUser(guestData);
+      props.updateUser(guestData, setUser);
 
-      logout();
+      props.logout(setUser);
       
       return;
     };
 
+
+    // <--------------------------------SIGNUP-------------------------------->
+
     if(signupError){
       console.log(signupError);
 
-      updateUser(signupError);
+      props.updateUser(signupError, setUser);
 
-      logout();
+      props.logout(setUser);
   
       setLoginState("system-error");
 
@@ -195,7 +171,7 @@ function LoginPage() {
       if(!signupData.register.response_type.includes("Error")){
         // console.log(signupData.register);
 
-        updateUser(signupData.register);
+        props.updateUser(signupData.register, setUser);
         
         setLoginState("success");
 
@@ -204,19 +180,22 @@ function LoginPage() {
   
       console.log(signupData);
 
-      updateUser(signupData);
+      props.updateUser(signupData, setUser);
 
-      logout();
+      props.logout(setUser);
       
       return;
     };
+
+
+    // <--------------------------------LOGIN-------------------------------->
   
     if(loginError){
       console.log(loginError);
       
-      updateUser(loginError);
+      props.updateUser(loginError, setUser);
 
-      logout();
+      props.logout(setUser);
       
       setLoginState("system-error");
 
@@ -227,24 +206,28 @@ function LoginPage() {
       if(!loginData.login.response_type.includes("Error")){
         // console.log(loginData.login);
         
-        updateUser(loginData.login);
+        props.updateUser(loginData.login, setUser);
 
         setLoginState("success");
 
         return;
       };
+
   
       console.log(loginData.login);
 
-      updateUser(loginData.login);
+      props.updateUser(loginData.login, setUser);
 
-      logout();
+      props.logout(setUser);
 
       setLoginState("invalid-login");
 
       return;
     };
-  }, [loginError, loginData, signupError, signupData, guestError, guestData, setUser])
+  }, [loginError, loginData, signupError, signupData, guestError, guestData, setUser, props])
+
+
+  // <--------------------------------RENDERFORM-------------------------------->
 
   const renderForm = () => {
     return (
@@ -258,6 +241,7 @@ function LoginPage() {
     )
   }
 
+  //Change login window tab
   const changeLoginTab = (e, loginOption) => {
     // see if this becomes a problem later
     document.forms[0].reset();
@@ -278,6 +262,9 @@ function LoginPage() {
   if(loginState === "success"){
     return <Redirect to='/home' />
   }
+
+
+  // <--------------------------------HTML-------------------------------->
 
   return (
     <div id="login-page">
