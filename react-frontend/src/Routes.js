@@ -159,7 +159,7 @@ function Routes() {
                 return;
             });
     }, []);
-    console.log("hello")
+
     return (
         <Router>
             <UserContext.Provider value={value}>
