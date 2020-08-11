@@ -14,26 +14,72 @@ import UserContext from './UserContext';
 import RouteGuard from './RouteGuard';
 import TopNav from "./TopNav/TopNav";
 
+//Update user
+const updateUser = (userData, setUser) => {
+    if(userData == "loading"){
+        setUser("loading");
+
+        return;
+    }
+
+    if(!userData || !userData.accessToken || !userData.response_type || userData.response_type !== "Success"){
+        setUser(null);
+
+        return;
+    }
+
+    setUser({
+      username: userData.username,
+      role: userData.role,
+      accessToken: userData.accessToken
+    })
+
+    return;
+}
+
+//Log user out
+const logout = (setUser) => {
+    axios.get("http://localhost:3000/deleteRefreshToken")
+        .then((response) => {
+            updateUser(response.data, setUser);
+
+            return;
+        })
+        .catch((error) => {
+            console.log(error.data);
+            updateUser(error.data, setUser);
+
+            return;
+        });
+}
+
+//TODO try to display loading page while refresh token function is propcessing
 //Using containers so top nav is not rendered on login page
-const LoginContainer = ({user, logout, updateUser}) => {
+//Written differently from others because this is how props are passed with Router components
+const LoginContainer = ({location, user}) => {
     return(
         <div>
-            <RouteGuard 
-                path="/login" 
-                component={LoginPage}
-                user={user}
-                logout={logout}
-                updateUser={updateUser}
+            <Route
+                path="/login"
+                location={location.state ? location : { ...location, state: { from: location } }}
+                render={(props) => (
+                    user === "loading"
+                        ? <div style={{height: "100%", display:"flex", justifyContent: "center", alignItems: "center"}}></div>
+                        : <LoginPage {...props} 
+                            logout={(setUser) => logout(setUser)}
+                            updateUser={(userData, setUser) => updateUser(userData, setUser)}  
+                        />
+                )}  
             />
         </div>
     )
 }
 
-const DefaultContainer = ({user, logout}) => {
+const DefaultContainer = ({user}) => {
     return(
         <div>
             <TopNav 
-                logout={logout}
+                logout={(setUser) => logout(setUser)}
             />
             <Route exact={true} path="/"><Redirect to="/home"/></Route>
             <RouteGuard 
@@ -66,41 +112,10 @@ const DefaultContainer = ({user, logout}) => {
                 component={Multiplayer} 
                 user={user}
             />
+
+            {/* Add 404 page here */}
         </div>
     )
-}
-
-//Update user
-const updateUser = (userData, setUser) => {
-    if(!userData || !userData.accessToken || !userData.response_type || userData.response_type !== "Success"){
-        setUser(null);
-
-        return;
-    }
-
-    setUser({
-      username: userData.username,
-      role: userData.role,
-      accessToken: userData.accessToken
-    })
-
-    return;
-}
-
-//Log user out
-const logout = (setUser) => {
-    axios.get("http://localhost:3000/deleteRefreshToken")
-        .then((response) => {
-            updateUser(response.data, setUser);
-
-            return;
-        })
-        .catch((error) => {
-            console.log(error.data);
-            updateUser(error.data, setUser);
-
-            return;
-        });
 }
 
 function Routes() {
@@ -128,6 +143,7 @@ function Routes() {
 
     //To make sure tokenRefresh attempt is only made once.
     useEffect(() => {
+        updateUser("loading", setUser)
         axios.get("http://localhost:3000/refreshToken")
             .then((response) => {
                 // console.log(response.data);
@@ -143,7 +159,7 @@ function Routes() {
                 return;
             });
     }, []);
-
+    console.log("hello")
     return (
         <Router>
             <UserContext.Provider value={value}>
@@ -153,11 +169,10 @@ function Routes() {
                         <Route
                             exact 
                             path="/login" 
-                            render={() => (
+                            render={(props) => (
                                 <LoginContainer
                                     user={user}
-                                    logout={logout}
-                                    updateUser={updateUser}
+                                    location={props.location}
                                 />
                             )}
                         />
@@ -165,7 +180,6 @@ function Routes() {
                             render={() => (
                                 <DefaultContainer
                                     user={user}
-                                    logout={logout}
                                 />
                             )}
                         />

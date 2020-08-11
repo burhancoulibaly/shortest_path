@@ -8,7 +8,7 @@ import 'popper.js/dist/umd/popper.min.js';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Routes />
+    <Routes id="page" />
   </React.StrictMode>,
   document.getElementById('root')
 );

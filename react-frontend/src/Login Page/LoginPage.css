@@ -1,12 +1,15 @@
 #login-page {
     height: 100%;
-    min-height: 100%;
     background-color: gray;
+}
+#login-page .login-container {
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
 }
-#login-page .login-container {
+#login-page .login-form {
+    position: fixed;
     width: 600px;
     height: 500px;
     background-color: white;

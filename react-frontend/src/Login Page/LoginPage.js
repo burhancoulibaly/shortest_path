@@ -118,7 +118,7 @@ function LoginPage(props) {
   const [signup, { error: signupError, data: signupData }] = useMutation(AuthHelper.signup);
 
   //Only rerenders on changes
-  useEffect(() => {  
+  useEffect(() => { 
     // <--------------------------------GUEST--------------------------------> 
     if(guestError){
       console.log(guestError);
@@ -259,30 +259,39 @@ function LoginPage(props) {
     return loginOption;
   }
 
+  // <--------------------------------HTML-------------------------------->
   if(loginState === "success"){
     return <Redirect to='/home' />
   }
 
+  if(user){
+    if(props.location.state){
+      if(props.location.state.from.pathname === "/login"){
+        return <Redirect to="/home" />
+      }
 
-  // <--------------------------------HTML-------------------------------->
+      return <Redirect to={props.location.state.from.pathname} />
+    }
+  }
 
   return (
     <div id="login-page">
       <div className="login-container">
-
-        {/* Login form */}
-        {renderForm()}
-   
-        <div className="login-options">
-          <button className="login-btn btn active" onClick={($event) => setLoginTab(changeLoginTab($event, `login`))}>
-            <h1>Login</h1>
-          </button>
-          <button className="signup-btn btn" onClick={($event) => setLoginTab(changeLoginTab($event, `signup`))}>
-            <h1>Sign Up</h1>
-          </button>
-          <button className="guest-btn btn" onClick={($event) => setLoginTab(changeLoginTab($event, `guest`))}>
-            <h1>Guest</h1>
-          </button>
+        <div className="login-form">
+          {/* Login form */}
+          {renderForm()}
+          
+          <div className="login-options">
+            <button className="login-btn btn active" onClick={($event) => setLoginTab(changeLoginTab($event, `login`))}>
+              <h1>Login</h1>
+            </button>
+            <button className="signup-btn btn" onClick={($event) => setLoginTab(changeLoginTab($event, `signup`))}>
+              <h1>Sign Up</h1>
+            </button>
+            <button className="guest-btn btn" onClick={($event) => setLoginTab(changeLoginTab($event, `guest`))}>
+              <h1>Guest</h1>
+            </button>
+          </div>
         </div>
       </div>
     </div>

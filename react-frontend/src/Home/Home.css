@@ -1,12 +1,15 @@
 #home{
     height: 100%;
-    min-height: 100%;
     background-color: gray;
+}
+#home .menu-container{
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
 }
-#home .menu-container{
+#home .menu-container .menu{
+    position: fixed;
     width: 600px;
     height: 500px;
     background-color: white;
@@ -23,3 +26,8 @@
 #home .menu-container .menu-buttons button{
     width: 100%;
 }
+#home .menu-container .menu-buttons h1{
+    margin: 0;
+}
+
+/* //Resize menu container for when the window size gets smaller so that it doesn't overlap the top nav */

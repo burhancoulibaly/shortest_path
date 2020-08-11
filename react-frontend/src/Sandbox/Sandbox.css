@@ -1,0 +1,22 @@
+#sandbox{
+    height: 100%;
+}
+#sandbox .map{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#sandbox .map .map-menu{
+    width: 100%;
+    height: 100%;
+    background-color: gray;
+}
+#sandbox .map .grid-row{
+    display: flex;
+    flex-direction: row;
+}
+#sandbox .map .square{
+    border: 1px solid gray;
+}
