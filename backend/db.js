@@ -109,8 +109,8 @@ async function refreshToken(refreshToken){
                 }
 
                 return resolve([{ 
-                    response_type: `Token refresh`,
-                    response: "Success", 
+                    response_type: `Success`,
+                    response: `Token refresh`,  
                     username: `${payload.username}`, 
                     role: `${payload.role}`,
                     accessToken: ``
@@ -130,8 +130,8 @@ async function refreshToken(refreshToken){
             }
             
             return resolve([{ 
-                response_type: `Token refresh`,
-                response: "Success", 
+                response_type: `Success`,
+                response: `Token refresh`, 
                 username: `${payload.username}`, 
                 role: `${payload.role}`,
                 accessToken: ``

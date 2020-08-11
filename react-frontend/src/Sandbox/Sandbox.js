@@ -69,21 +69,6 @@ function Map(props) {
         grid: new Array(15*50).fill({val: false, type: null}),
         itemType: "start"
     })
-
-    // useEffect(() => {
-    //     console.log(state.itemType)
-    //     setState(state => ({
-    //         ...state,
-    //         //state object is immutable so updates have to be done this way
-    //         grid: state.grid.map((square) => {
-    //             if(!square.val){
-    //                 return {...square, type: state.itemType} 
-    //             }
-
-    //             return {...square}
-    //         })
-    //     }));
-    // },[state.itemType])
     
     const renderSquare = (x,y,val) => {
         return (
