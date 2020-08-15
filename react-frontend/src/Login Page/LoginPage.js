@@ -110,7 +110,7 @@ const LoginForm = (props) => {
 
 function LoginPage(props) {
   //Login tab state variable
-  const [user, setUser] = useContext(UserContext);
+  const {user, setUser} = useContext(UserContext);
   const [loginTab, setLoginTab] = useState("login");
   const [loginState, setLoginState] = useState("");
   const [login, { error: loginError, data: loginData }] = useLazyQuery(AuthHelper.login, { fetchPolicy: "network-only" });

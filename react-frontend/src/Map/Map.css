@@ -1,0 +1,19 @@
+#map{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#map *, #map *::before, #map *::after{
+    box-sizing: border-box;
+}
+#map .grid-row{
+    display: flex;
+    flex-direction: row;
+}
+#map .square{
+    margin: 2px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    transition: background 250ms ease;
+}

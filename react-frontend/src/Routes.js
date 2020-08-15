@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import axios from "axios";
 import apolloClient from './ApolloConfig'
 import LoginPage from './Login Page/LoginPage';
+import TopNav from "./TopNav/TopNav";
 import Home from './Home/Home';
 import Account from "./Account/Account";
 import App from './App/App';
@@ -12,11 +13,10 @@ import { ApolloProvider } from '@apollo/client';
 import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 import UserContext from './UserContext';
 import RouteGuard from './RouteGuard';
-import TopNav from "./TopNav/TopNav";
 
 //Update user
 const updateUser = (userData, setUser) => {
-    if(userData == "loading"){
+    if(userData === "loading"){
         setUser("loading");
 
         return;
@@ -139,7 +139,7 @@ function Routes() {
     );
 
     //will only recompute the memoized value when one of the dependencies has changed
-    const value = useMemo(() => ([user, setUser]), [user, setUser]);
+    const userState = useMemo(() => ({user, setUser}), [user, setUser]);
 
     //To make sure tokenRefresh attempt is only made once.
     useEffect(() => {
@@ -162,7 +162,7 @@ function Routes() {
 
     return (
         <Router>
-            <UserContext.Provider value={value}>
+            <UserContext.Provider value={userState}>
                 <ApolloProvider client={apolloClient}>
                     <Switch>
                         {/* Render is used to pass props to components rendered by React Router */}

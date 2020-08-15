@@ -1,11 +1,10 @@
 import React, { useContext } from 'react';
 import './TopNav.css';
-import { Link } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import UserContext from "../UserContext";
 
 function TopNav(props) {
-  const [user, setUser] = useContext(UserContext);
+  const {user, setUser} = useContext(UserContext);
   
   return (
     <div id="topnav">
