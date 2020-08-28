@@ -10,7 +10,8 @@ function init(initialState){
         clear: initialState.clear,
         run: initialState.run,
         heuristic: initialState.heuristic,
-        isDrawn: initialState.isDrawn
+        algorithm: initialState.algorithm,
+        pathClear: initialState.pathClear
     }
 }
 
@@ -20,16 +21,20 @@ function reducer(menuState, action){
             return {...menuState, itemState: action.payload.itemState}
         case 'setHeuristic':
             return {...menuState, heuristic: action.payload.heuristic}
+        case 'setAlgorithm':
+            return {...menuState, algorithm: action.payload.algorithm}   
         case 'clear':
             return {...menuState, clear: true};
         case 'cleared':
             return {...menuState, clear: false};
+        case 'pathClear':
+            return {...menuState, pathClear: true};
+        case 'pathCleared':
+            return {...menuState, pathClear: false};
         case 'run':
             return {...menuState, run: true};
         case 'complete':
             return {...menuState, run: false};
-        case 'drawn':
-            return {...menuState, isDrawn: !menuState.isDrawn};
         case 'reset':
             return init(action.payload);
         default:
@@ -43,9 +48,10 @@ function Sandbox() {
     const initialState = {
         itemState: "start",
         heuristic: "euclidean",
+        algorithm: "astar",
         clear: false,
+        pathClear: false,
         run: false,
-        isDrawn: false
     }
 
     const [menuState, dispatch] = useReducer(reducer, initialState, init)

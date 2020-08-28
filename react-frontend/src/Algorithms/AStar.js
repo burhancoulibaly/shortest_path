@@ -7,7 +7,6 @@ function getIndex(x, y, cols){
 function heuristic(startPoint, endPoint, heuristic){
     //TODO make this a switch for the different types of heuristic functions
     let distance;
-
     switch (heuristic) {
         case "euclidean":
             distance = Math.sqrt(Math.pow((endPoint.x-startPoint.x), 2) + Math.pow((endPoint.y-startPoint.y), 2));
@@ -32,7 +31,7 @@ function heuristic(startPoint, endPoint, heuristic){
 
 function dist(startPoint, endPoint){
     //TODO make this a switch for the different types of heuristic functions
-    const distance = Math.sqrt(Math.pow((endPoint.x-startPoint.x), 2) + Math.pow((endPoint.y-startPoint.y), 2));     
+    const distance = Math.sqrt(Math.pow((endPoint.x-startPoint.x), 2) + Math.pow((endPoint.y-startPoint.y), 2)); 
 
     return distance;
 } 
@@ -40,7 +39,7 @@ function dist(startPoint, endPoint){
 function getPoints(gridMap){
     let startPoint = null;
     let endPoints = [];
-
+    
     gridMap.map((square) => {
         if(square.val && square.type ===  "start"){
             // console.log(square);
@@ -78,56 +77,56 @@ function getNeighbors(point, gridMap, rows, cols){
     if(point.x > 0){
         const left = getIndex((point.x-1), (point.y), cols);
 
-        if((!gridMap[left].val && gridMap[left].type !== "wall" && gridMap[left].type !== "start") || (gridMap[left].val && gridMap[left].type === "end")){
+        if(gridMap[left].type !== "wall" && gridMap[left].type !== "start"){
             neighbors[0] = gridMap[left];
         }
     }
     if(point.x < cols-1){
         const right = getIndex((point.x+1), (point.y), cols);
 
-        if((!gridMap[right].val && gridMap[right].type !== "wall" && gridMap[right].type !== "start") || (gridMap[right].val && gridMap[right].type === "end")){
+        if(gridMap[right].type !== "wall" && gridMap[right].type !== "start"){
             neighbors[1] = gridMap[right];
         }
     }
     if(point.y > 0){
         const up = getIndex((point.x), (point.y-1), cols);
 
-        if((!gridMap[up].val && gridMap[up].type !== "wall" && gridMap[up].type !== "start") || (gridMap[up].val && gridMap[up].type === "end")){
+        if(gridMap[up].type !== "wall" && gridMap[up].type !== "start"){
             neighbors[2] = gridMap[up];
         }
     }
     if(point.y < rows-1){
         const down = getIndex((point.x), (point.y+1), cols);
 
-        if((!gridMap[down].val && gridMap[down].type !== "wall" && gridMap[down].type !== "start") || (gridMap[down].val && gridMap[down].type === "end")){
+        if(gridMap[down].type !== "wall" && gridMap[down].type !== "start"){
             neighbors[3] = gridMap[down];
         }
     }
     if(point.x > 0 && point.y > 0){
         const topLeft = getIndex((point.x-1), (point.y-1), cols);
 
-        if((!gridMap[topLeft].val && gridMap[topLeft].type !== "wall" && gridMap[topLeft].type !== "start") || (gridMap[topLeft].val && gridMap[topLeft].type === "end")){
+        if(gridMap[topLeft].type !== "wall" && gridMap[topLeft].type !== "start"){
             neighbors[4] = gridMap[topLeft];
         }
     }
     if(point.x < cols-1 && point.y > 0){
         const topRight = getIndex((point.x+1), (point.y-1), cols);
 
-        if((!gridMap[topRight].val && gridMap[topRight].type !== "wall" && gridMap[topRight].type !== "start") || (gridMap[topRight].val && gridMap[topRight].type === "end")){
+        if(gridMap[topRight].type !== "wall" && gridMap[topRight].type !== "start"){
             neighbors[5] = gridMap[topRight];
         }
     }
     if(point.x > 0 && point.y < rows-1){
         const bottomLeft  = getIndex((point.x-1), (point.y+1), cols);
 
-        if((!gridMap[bottomLeft].val && gridMap[bottomLeft].type !== "wall" && gridMap[bottomLeft].type !== "start") || (gridMap[bottomLeft].val && gridMap[bottomLeft].type === "end")){
+        if(gridMap[bottomLeft].type !== "wall" && gridMap[bottomLeft].type !== "start"){
             neighbors[6] = gridMap[bottomLeft];
         }
     }
     if(point.x < cols-1 && point.y < rows-1){
         const bottomRight = getIndex((point.x+1), (point.y+1), cols);
 
-        if((!gridMap[bottomRight].val && gridMap[bottomRight].type !== "wall" && gridMap[bottomRight].type !== "start") || (gridMap[bottomRight].val && gridMap[bottomRight].type === "end")){
+        if(gridMap[bottomRight].type !== "wall" && gridMap[bottomRight].type !== "start"){
             neighbors[7] = gridMap[bottomRight];
         }
     }
@@ -135,12 +134,26 @@ function getNeighbors(point, gridMap, rows, cols){
     return neighbors;
 }
 
-function AStar(rows, cols, gridMap, heuristicType){
+function AStar(rows, cols, gridMap, heuristicType, memState, setState){
     const [startPoint, endPoints] = getPoints(gridMap);
     const openSet = new MinHeap();
     const cameFrom = {};
     const gScore = {};
     const fScore = {};
+    const states = [];
+
+    //TODO: Bug, clears grid but then returns it to its previous state
+    const newState = {
+        ...memState,
+        grid: new Array(rows*cols).fill({val: false, type: null}).map((square, i) => {
+            return {
+                ...square,
+                x: i % cols,
+                y: Math.abs((i - (i % cols)) / cols)
+            }
+        })
+    }
+    states.push(newState);
 
     let goal = null;
 
@@ -183,32 +196,77 @@ function AStar(rows, cols, gridMap, heuristicType){
     openSet.insert({point: startPoint, val: fScore[getIndex(startPoint.x, startPoint.y, cols)]});
 
     while(openSet.getHeap().length !== 0){
-        // console.log(openSet.getHeap());
-        // console.log(openSet.peek());
+        // console.log(Array.from(openSet.getHeap()));
+        // console.log(Object.assign({},openSet.peek()));
         const current = openSet.peek().point;
 
-        // console.log(cameFrom[getIndex(current.x, current.y, cols)]);
+        openSet.extract();
 
-        // console.log(current);
+        
+        const newState = {
+            ...memState,
+            grid: memState.grid.map((square, index) => {
+                if(current.x === square.x && current.y === square.y){
+                    if(current.type !== "start" && current.type !== "end"){
+                        memState.grid[index] = {
+                            ...memState.grid[index],
+                            val: true,
+                            type: "neighbors"
+                        }
+                    }
+                    return {...square}
+                }
+                return {...square}
+            })
+        }
+        states.push(newState);
 
         if(current.x === goal.x && current.y === goal.y){
+            const state = states[states.length-1];
+            setState({
+                // return {
+                ...state,
+                //state object is immutable so updates have to be done this way
+                grid: state.grid.map((square, index) => {
+                    if(cameFrom[index]){
+                        if(square.type === "end"){
+                            let prev = cameFrom[index];
+                
+                            while(prev){                   
+                                if(prev.type !== "start" && prev.type !== "end"){
+                                    state.grid[getIndex(prev.x,prev.y,state.cols)] = {
+                                        ...state.grid[getIndex(prev.x,prev.y,state.cols)],
+                                        val: true,
+                                        type: "path"
+                                    }
+                                }
+                                prev = cameFrom[getIndex(prev.x,prev.y,state.cols)];
+                            }
+                            return {...square};
+                        }
+                        return {...square};
+                    }
+                    return {...square};
+                })
+             
+            });
+
             console.log("PATH FOUND!!!!!");
-            return [cameFrom, openSet.getHeap()];
+            return states;
         }
 
-        openSet.extract();
+        // console.log(current); 
 
         const neighbors = getNeighbors(current, gridMap, rows, cols);
 
         neighbors.map((neighbor) => {
             // console.log(neighbor);
             // console.log((gScore[getIndex(current.x, current.y, cols)] + dist(current, neighbor)) + heuristic(neighbor, goal));
-            
             // console.log("neighbor", neighbor);
+
             const currentPathGScore = gScore[getIndex(current.x, current.y, cols)] + dist(current, neighbor);
-
+            
             if(currentPathGScore < gScore[getIndex(neighbor.x, neighbor.y, cols)] || !gScore[getIndex(neighbor.x, neighbor.y, cols)]){
-
                 cameFrom[getIndex(neighbor.x, neighbor.y, cols)] = current;
 
                 gScore[getIndex(neighbor.x, neighbor.y, cols)] = currentPathGScore;
@@ -219,16 +277,34 @@ function AStar(rows, cols, gridMap, heuristicType){
                 
                 if(!openSet.find(neighbor,fScore[getIndex(neighbor.x, neighbor.y, cols)])){
                     openSet.insert({point: neighbor, val: fScore[getIndex(neighbor.x, neighbor.y, cols)]});
+                    
+                    const newState = {
+                        ...memState,
+                        grid: memState.grid.map((square, index) => {
+                            if(neighbor.x === square.x && neighbor.y === square.y){
+                                if(neighbor.type !== "start" && neighbor.type !== "end"){
+                                    memState.grid[index] = {
+                                        ...memState.grid[index],
+                                        val: true,
+                                        type: "openset"
+                                    }
+                                }
+                                return {...square}
+                            }
+                            return {...square}
+                        })
+                    }
+                    states.push(newState); 
+                    
+                    return null;
                 }
-                
                 return null;
             }
-            
-            return null; 
+            return null;
         });
     }
 
-    return [cameFrom, openSet.getHeap()];
+    return states;
 }
 
 export default AStar

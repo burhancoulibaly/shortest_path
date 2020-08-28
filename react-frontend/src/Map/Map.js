@@ -1,8 +1,11 @@
-import React, { useState, useContext, useEffect, useMemo } from 'react';
+import React, { useState, useContext, useEffect, useMemo, useCallback } from 'react';
 import './Map.css';
 import Square from '../Square/Square';
 import MenuContext from '../MenuContext';
-import AStar from '../Algorithms/AStar'
+import AStar from '../Algorithms/AStar';
+import Dijkstra from '../Algorithms/Dijkstra'
+import BFS from '../Algorithms/BFS'
+import DFS from '../Algorithms/DFS'
 
 function Map(props) {
     const {menuState, dispatch} = useContext(MenuContext);
@@ -47,109 +50,89 @@ function Map(props) {
             return dispatch({type: "cleared"});
         }
     }, [menuState.clear, dispatch]);
+
+    //If menu clear path button is clicked
+    useEffect(() => {
+        if(menuState.pathClear === true){
+            setState((memState) => ({
+                ...memState,
+                grid: memState.grid.map((square, index) => {
+                    if(square.type !== "start" && square.type !== "end" && square.type !== "wall"){
+                        return {...square, val: false, type: null}
+                    }
+            
+                    return {...square}
+                })
+            }))
+            return dispatch({type: "pathCleared"});
+        }
+    }, [menuState.pathClear, dispatch]);
     
+    const drawPath = useCallback((newState) => {
+        setTimeout(() => {
+            if(menuState.run){
+                setState({
+                    ...newState,
+                    //newState object is immutable so updates have to be done this way
+                    grid: newState.grid
+                }); 
+            }
+        }, 4)
+    },[menuState.run])
+
     //If run menu button is clicked
     useEffect(() => {
         if(menuState.run === true){
-            // if(menuState.isDrawn){
-            //     clearPath();
-            //     dispatch({type: "drawn"});
-            // }
+            let states = null;
 
-            //Visualize path finding algorithm logic
-            console.time()
-            const [path, heap] = AStar(memState.rows, memState.cols, memState.grid, menuState.heuristic);
-            console.timeEnd()
+            // Visualize path finding algorithm logic
+            // console.time()
+            switch (menuState.algorithm) {
+                case "astar":
+                    states = AStar(memState.rows, memState.cols, memState.grid, menuState.heuristic, memState, setState);
 
-            if(path && heap){
-                console.log(path);
-                console.log(heap);
+                    break;
+                case "dijkstra":
+                    states = Dijkstra(memState.rows, memState.cols, memState.grid, memState, setState);
 
-                drawPath(path, heap);
-            }            
+                    break;
+                case "bfs":
+                    states = BFS(memState.rows, memState.cols, memState.grid, memState, setState);
+
+                    break;
+                case "dfs":
+                    states = DFS(memState.rows, memState.cols, memState.grid, memState, setState);
+
+                    break;
+                default:
+                    console.log("Must choose a path finding algorithm")
+                    break;
+            }
+            // console.timeEnd()
+            
+            states
+            .filter((newState, index) => {
+                if(index % 20 === 0){
+                    return newState;
+                }
+
+                if(index === states.length-1){
+                    return newState;
+                }
+
+                return null;
+                
+            })
+            .map((newState) => {
+                drawPath(newState);
+
+                return null
+            })
 
             return dispatch({type: "complete"});
         }
-    }, [menuState.run, menuState.heuristic, memState.grid, memState.rows, memState.cols, dispatch]);
+    }, [menuState.run, menuState.heuristic, menuState.algorithm, memState.grid, memState.rows, memState.cols, memState, drawPath, dispatch]);
 
-    // const clearPath = () => {
-    //     setState((memState) => ({
-    //         ...memState,
-    //         grid: memState.grid.map((square, index) => {
-    //             console.log("clearing");
-    //             console.log(memState.grid[index-1]);
-    //             if(square.type !== "start" && square.type !== "end"){
-    //                 memState.grid[index] = {
-    //                     ...square,
-    //                     val: false,
-    //                     type: "path"
-    //                 }
-    //             }
-
-    //             return {...square}
-    //         })
-    //     }))
-    //     return;
-    // }
-
-    const drawPath = (path, heap) => {
-        setState((memState) => ({
-            ...memState,
-            //state object is immutable so updates have to be done this way
-            grid: memState.grid.map((square, index) => {
-                if(path[index]){
-                    heap.map((heapPoint) => {
-                        if(heapPoint.point.x + (heapPoint.point.y * memState.cols) === index){
-                            square = memState.grid[heapPoint.point.x + (heapPoint.point.y * memState.cols)];
-    
-                            if(square.type !== "start" && square.type !== "end"  && square.type !== "path" && square.type !== "neighbors"){
-                                memState.grid[heapPoint.point.x + (heapPoint.point.y * memState.cols)] = {
-                                    ...square,
-                                    val: true,
-                                    type: "openset"
-                                }
-    
-                                // console.log(memState.grid[heapPoint.point.x + (heapPoint.point.y * memState.cols)])
-                            }
-    
-                            return null;
-                        }
-    
-                        return {...memState.grid[heapPoint.point.x + (heapPoint.point.y * memState.cols)]}
-                    })
-
-
-                    if(square.type !== "start" && square.type !== "end" && square.type !== "path" && square.type !== "openset"){
-                        return {...square, val: true, type: "neighbors"};
-                    }
-                }
-
-                if(square.type === "end"){
-                    let cameFrom = path[index];
-
-                    while(cameFrom){
-                        square = memState.grid[cameFrom.x + (cameFrom.y * memState.cols)];
-                        
-                        if(square.type !== "start" && square.type !== "end"){
-                            memState.grid[cameFrom.x + (cameFrom.y * memState.cols)] = {
-                                ...square,
-                                val: true,
-                                type: "path"
-                            }
-                        }
-
-                        cameFrom = path[cameFrom.x + (cameFrom.y * memState.cols)];
-                    }
-                    
-                    return {...memState.grid[index]};
-                }
-
-                return {...square};
-            })
-        }));
-
-        // dispatch({type: "drawn"});
-    }
     
     const renderSquare = (x,y,val) => {
         return (
@@ -289,9 +272,9 @@ function Map(props) {
 
     return (
         <div id="map">
-            {console.time()}
+            {/* {console.time()} */}
                 {renderMap()}
-            {console.timeEnd()}
+            {/* {console.timeEnd()} */}
         </div>
     )
 }
