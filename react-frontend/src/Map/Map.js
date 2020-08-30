@@ -3,9 +3,11 @@ import './Map.css';
 import Square from '../Square/Square';
 import MenuContext from '../MenuContext';
 import AStar from '../Algorithms/AStar';
-import Dijkstra from '../Algorithms/Dijkstra'
-import BFS from '../Algorithms/BFS'
-import DFS from '../Algorithms/DFS'
+import Dijkstra from '../Algorithms/Dijkstra';
+import BFS from '../Algorithms/BFS';
+import DFS from '../Algorithms/DFS';
+import GreedyBFS from '../Algorithms/GreedyBFS';
+
 
 function Map(props) {
     const {menuState, dispatch} = useContext(MenuContext);
@@ -102,6 +104,10 @@ function Map(props) {
                     break;
                 case "dfs":
                     states = DFS(memState.rows, memState.cols, memState.grid, memState, setState);
+
+                    break;
+                case "greedybfs":
+                    states = GreedyBFS(memState.rows, memState.cols, memState.grid, menuState.heuristic, memState, setState);
 
                     break;
                 default:

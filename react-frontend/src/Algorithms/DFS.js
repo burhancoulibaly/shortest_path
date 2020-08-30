@@ -46,56 +46,56 @@ function getNeighbors(point, gridMap, rows, cols, discovered){
     if(point.x > 0){
         const left = getIndex((point.x-1), (point.y), cols);
 
-        if(gridMap[left].type !== "wall" && gridMap[left].type !== "start" && !discovered[getIndex(gridMap[left].x, gridMap[left].y, cols)]){
+        if(gridMap[left].type !== "wall" && gridMap[left].type !== "start"){
             neighbors[4] = gridMap[left];
         }
     }
     if(point.x < cols-1){
         const right = getIndex((point.x+1), (point.y), cols);
 
-        if(gridMap[right].type !== "wall" && gridMap[right].type !== "start" && !discovered[getIndex(gridMap[right].x, gridMap[right].y, cols)]){
+        if(gridMap[right].type !== "wall" && gridMap[right].type !== "start"){
             neighbors[6] = gridMap[right];
         }
     }
     if(point.y > 0){
         const up = getIndex((point.x), (point.y-1), cols);
 
-        if(gridMap[up].type !== "wall" && gridMap[up].type !== "start" && !discovered[getIndex(gridMap[up].x, gridMap[up].y, cols)]){
+        if(gridMap[up].type !== "wall" && gridMap[up].type !== "start"){
             neighbors[7] = gridMap[up];
         }
     }
     if(point.y < rows-1){
         const down = getIndex((point.x), (point.y+1), cols);
 
-        if(gridMap[down].type !== "wall" && gridMap[down].type !== "start" && !discovered[getIndex(gridMap[down].x, gridMap[down].y, cols)]){
+        if(gridMap[down].type !== "wall" && gridMap[down].type !== "start"){
             neighbors[5] = gridMap[down];
         }
     }
     if(point.x > 0 && point.y > 0){
         const topLeft = getIndex((point.x-1), (point.y-1), cols);
 
-        if(gridMap[topLeft].type !== "wall" && gridMap[topLeft].type !== "start" && !discovered[getIndex(gridMap[topLeft].x, gridMap[topLeft].y, cols)]){
+        if(gridMap[topLeft].type !== "wall" && gridMap[topLeft].type !== "start"){
             neighbors[0] = gridMap[topLeft];
         }
     }
     if(point.x < cols-1 && point.y > 0){
         const topRight = getIndex((point.x+1), (point.y-1), cols);
 
-        if(gridMap[topRight].type !== "wall" && gridMap[topRight].type !== "start" && !discovered[getIndex(gridMap[topRight].x, gridMap[topRight].y, cols)]){
+        if(gridMap[topRight].type !== "wall" && gridMap[topRight].type !== "start"){
             neighbors[1] = gridMap[topRight];
         }
     }
     if(point.x > 0 && point.y < rows-1){
         const bottomLeft  = getIndex((point.x-1), (point.y+1), cols);
 
-        if(gridMap[bottomLeft].type !== "wall" && gridMap[bottomLeft].type !== "start" && !discovered[getIndex(gridMap[bottomLeft].x, gridMap[bottomLeft].y, cols)]){
+        if(gridMap[bottomLeft].type !== "wall" && gridMap[bottomLeft].type !== "start"){
             neighbors[3] = gridMap[bottomLeft];
         }
     }
     if(point.x < cols-1 && point.y < rows-1){
         const bottomRight = getIndex((point.x+1), (point.y+1), cols);
 
-        if(gridMap[bottomRight].type !== "wall" && gridMap[bottomRight].type !== "start" && !discovered[getIndex(gridMap[bottomRight].x, gridMap[bottomRight].y, cols)]){
+        if(gridMap[bottomRight].type !== "wall" && gridMap[bottomRight].type !== "start"){
             neighbors[2] = gridMap[bottomRight];
         }
     }
@@ -136,12 +136,13 @@ function DFS(rows, cols, gridMap, memState, setState){
 
     stack.push(points[getIndex(startPoint.x, startPoint.y, cols)]);
 
-    while(stack.getStack().length > 0){
+    while(stack.length() > 0){
         // console.log(Array.from(stack.getStack()));
         const current = stack.top();
         // console.log("current",current);
 
         stack.pop();
+        discovered[getIndex(current.x, current.y, cols)] = "discovered";
         
         const newState = {
             ...memState,
@@ -161,50 +162,47 @@ function DFS(rows, cols, gridMap, memState, setState){
         }
         states.push(newState);
         
-        if(!discovered[getIndex(current.x, current.y, cols)]){
-            if(current.x === goal.x && current.y === goal.y){
-                const state = states[states.length-1];
-                console.log(cameFrom)
-                setState({
-                    ...state,
-                    //state object is immutable so updates have to be done this way
-                    grid: state.grid.map((square, index) => {
-                        if(cameFrom[index]){
-                            if(square.type === "end"){
-                                let prev = cameFrom[index];
-                                
-                                while(prev !== null){                  
-                                    if(prev.type !== "start" && prev.type !== "end"){
-                                        state.grid[getIndex(prev.x,prev.y,state.cols)] = {
-                                            ...state.grid[getIndex(prev.x,prev.y,state.cols)],
-                                            val: true,
-                                            type: "path"
-                                        }
+        if(current.x === goal.x && current.y === goal.y){
+            const state = states[states.length-1];
+            setState({
+                ...state,
+                //state object is immutable so updates have to be done this way
+                grid: state.grid.map((square, index) => {
+                    if(cameFrom[index]){
+                        if(square.type === "end"){
+                            let prev = cameFrom[index];
+                            
+                            while(prev !== null){                  
+                                if(prev.type !== "start" && prev.type !== "end"){
+                                    state.grid[getIndex(prev.x,prev.y,state.cols)] = {
+                                        ...state.grid[getIndex(prev.x,prev.y,state.cols)],
+                                        val: true,
+                                        type: "path"
                                     }
-
-                                    prev = cameFrom[getIndex(prev.x,prev.y,state.cols)];
                                 }
-                                return {...square};
+
+                                prev = cameFrom[getIndex(prev.x,prev.y,state.cols)];
                             }
                             return {...square};
                         }
                         return {...square};
-                    })
-                 
-                });
-    
-                console.log("PATH FOUND!!!!!");
-                return states;
-            }
+                    }
+                    return {...square};
+                })
+                
+            });
 
-            const neighbors = getNeighbors(current, gridMap, rows, cols, discovered);
-    
-            neighbors.map((neighbor) => {
+            console.log("PATH FOUND!!!!!");
+            return states;
+        }
+
+        const neighbors = getNeighbors(current, gridMap, rows, cols, discovered);
+
+        neighbors.map((neighbor) => {
+            if(!discovered[getIndex(neighbor.x, neighbor.y, cols)]){
                 points[getIndex(neighbor.x, neighbor.y, cols)] = neighbor;
 
-                // if(!cameFrom[getIndex(neighbor.x, neighbor.y, cols)]){
-                    cameFrom[getIndex(neighbor.x, neighbor.y, cols)] = current;
-                // }
+                cameFrom[getIndex(neighbor.x, neighbor.y, cols)] = current;
 
                 stack.push(points[getIndex(neighbor.x, neighbor.y, cols)]);
 
@@ -227,10 +225,10 @@ function DFS(rows, cols, gridMap, memState, setState){
                 states.push(newState); 
     
                 return null;
-            });
+            }
 
-            discovered[getIndex(current.x, current.y, cols)] = "discovered";
-        }
+            return null
+        });
     }
     return states;
 }

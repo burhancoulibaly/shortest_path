@@ -275,7 +275,7 @@ function AStar(rows, cols, gridMap, heuristicType, memState, setState){
                 
                 fScore[getIndex(neighbor.x, neighbor.y, cols)] = (gScore[getIndex(neighbor.x, neighbor.y, cols)] + hScore);
                 
-                if(!openSet.find(neighbor,fScore[getIndex(neighbor.x, neighbor.y, cols)])){
+                if(!openSet.find(fScore[getIndex(neighbor.x, neighbor.y, cols)], neighbor)){
                     openSet.insert({point: neighbor, val: fScore[getIndex(neighbor.x, neighbor.y, cols)]});
                     
                     const newState = {

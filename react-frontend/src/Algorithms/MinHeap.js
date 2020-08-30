@@ -88,9 +88,13 @@ class MinHeap{
         return min;
     }
 
-    find = (fScore, point) => {
+    find = (val, point) => {
+        if(!val || !point){
+            return;
+        }
+
         for(let i = 0; i < this._heap.length; i++){
-            if(this._heap[i].val === fScore && this._heap.point.x === point.x && this._heap.point.y === point.y){
+            if(this._heap[i].val === val && this._heap[i].point.x === point.x && this._heap[i].point.y === point.y){
                 return i;
             }
         }
@@ -98,9 +102,9 @@ class MinHeap{
         return;
     }
 
-    delete = (fScore, point) => {
+    delete = (val, point) => {
         for(let i = 0; i < this._heap.length; i++){
-            if(this._heap[i].val === fScore && this._heap.point.x === point.x && this._heap.point.y === point.y){
+            if(this._heap[i].val === val && this._heap[i].point.x === point.x && this._heap[i].point.y === point.y){
                 if(this._heap.length === 1){
                     this._heap.pop();
 
@@ -120,9 +124,9 @@ class MinHeap{
         return;
     }
 
-    replace = (fScore, point) => {
+    replace = (val, point) => {
         for(let i = 0; i < this._heap.length; i++){
-            if(this._heap[i].val === fScore && this._heap.point.x === point.x && this._heap.point.y === point.y){
+            if(this._heap[i].val === val && this._heap[i].point.x === point.x && this._heap[i].point.y === point.y){
                 if(this._heap.length === 1){
                     this._heap.pop();
 

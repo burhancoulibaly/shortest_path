@@ -12,7 +12,7 @@ class Stack{
     }
 
     top = () => {
-        return this._stack[this._stack.length-1];
+        return this._stack[this.length()-1];
     }
 
     length = () => {

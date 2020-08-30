@@ -14,6 +14,7 @@ function Menu(){
             <button onClick={() => dispatch({type: 'setAlgorithm', payload: { algorithm: "dijkstra" }})}>Dijkstra</button>
             <button onClick={() => dispatch({type: 'setAlgorithm', payload: { algorithm: "bfs" }})}>Breadth First Search</button>
             <button onClick={() => dispatch({type: 'setAlgorithm', payload: { algorithm: "dfs" }})}>Depth First Search</button>
+            <button onClick={() => dispatch({type: 'setAlgorithm', payload: { algorithm: "greedybfs" }})}>Greedy Best First Search</button>
             <button onClick={() => dispatch({type: 'setHeuristic', payload: { heuristic: "manhattan" }})}>Manhattan Distance</button>
             <button onClick={() => dispatch({type: 'setHeuristic', payload: { heuristic: "euclidean" }})}>Euclidean Distance</button>
             <button onClick={() => dispatch({type: 'pathClear'})}>Clear Path</button>
