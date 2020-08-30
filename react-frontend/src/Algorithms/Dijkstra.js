@@ -36,7 +36,7 @@ function getPoints(gridMap){
     return [startPoint, endPoints];
 }
 
-function getNeighbors(current, rows, cols, node){
+function getNeighbors(current, rows, cols, node, cutCorners, allowDiags){
     //Point                                 Index
     // left point.x-1, point.y              (point.x-1) + (point.y * cols)
     // right point.x+1, point.y             (point.x+1) + (point.y * cols)
@@ -80,36 +80,68 @@ function getNeighbors(current, rows, cols, node){
     if(current.getPoint().x > 0 && current.getPoint().y > 0){
         const topLeft = getIndex((current.getPoint().x-1), (current.getPoint().y-1), cols);
 
-        if(node[topLeft].node.getPoint().type !== "wall"){
-            neighbors[4] = node[topLeft].node;   
+        if(node[topLeft].node.getPoint().type !== "wall" && node[topLeft].node.getPoint().type !== "start"){
+            if(allowDiags){
+                if(!cutCorners){
+                    if(node[topLeft+1].node.getPoint().type !== "wall" && node[topLeft+50].node.getPoint().type !== "wall"){
+                        neighbors[4] = node[topLeft].node;
+                    }
+                }else{
+                    neighbors[4] = node[topLeft].node;
+                }
+            }
         }
     }
     if(current.getPoint().x < cols-1 && current.getPoint().y > 0){
         const topRight = getIndex((current.getPoint().x+1), (current.getPoint().y-1), cols);
 
-        if(node[topRight].node.getPoint().type !== "wall"){
-            neighbors[5] = node[topRight].node;            
+        if(node[topRight].node.getPoint().type !== "wall" && node[topRight].node.getPoint().type !== "start"){
+            if(allowDiags){
+                if(!cutCorners){
+                    if(node[topRight-1].node.getPoint().type !== "wall" && node[topRight+50].node.getPoint().type !== "wall"){
+                        neighbors[5] = node[topRight].node; 
+                    }
+                }else{
+                    neighbors[5] = node[topRight].node; 
+                }
+            }
         }
     }
     if(current.getPoint().x > 0 && current.getPoint().y < rows-1){
         const bottomLeft  = getIndex((current.getPoint().x-1), (current.getPoint().y+1), cols);
 
-        if(node[bottomLeft].node.getPoint().type !== "wall"){
-            neighbors[6] = node[bottomLeft].node;   
+        if(node[bottomLeft].node.getPoint().type !== "wall" && node[bottomLeft].node.getPoint().type !== "start"){
+            if(allowDiags){
+                if(!cutCorners){
+                    if(node[bottomLeft+1].node.getPoint().type !== "wall" && node[bottomLeft-50].node.getPoint().type !== "wall"){
+                        neighbors[6] = node[bottomLeft].node;
+                    }
+                }else{
+                    neighbors[6] = node[bottomLeft].node;
+                }
+            }
         }
     }
     if(current.getPoint().x < cols-1 && current.getPoint().y < rows-1){
         const bottomRight = getIndex((current.getPoint().x+1), (current.getPoint().y+1), cols);
 
-        if(node[bottomRight].node.getPoint().type !== "wall"){
-            neighbors[7] = node[bottomRight].node;   
+        if(node[bottomRight].node.getPoint().type !== "wall" && node[bottomRight].node.getPoint().type !== "start"){
+            if(allowDiags){
+                if(!cutCorners){
+                    if(node[bottomRight-1].node.getPoint().type !== "wall" && node[bottomRight-50].node.getPoint().type !== "wall"){
+                        neighbors[7] = node[bottomRight].node; 
+                    }
+                }else{
+                    neighbors[7] = node[bottomRight].node; 
+                }
+            }
         }
     }
 
     return neighbors;
 }
 
-function Dijkstra(rows, cols, gridMap, memState, setState){
+function Dijkstra(rows, cols, gridMap, memState, setState, cutCorners, allowDiags){
     const [startPoint, endPoints] = getPoints(gridMap);
     const heap = new FibonacciHeap();
     const cameFrom = {};
@@ -213,7 +245,7 @@ function Dijkstra(rows, cols, gridMap, memState, setState){
             return states;
         }
 
-        const neighbors = getNeighbors(current, rows, cols, node);
+        const neighbors = getNeighbors(current, rows, cols, node, cutCorners, allowDiags);
 
         // console.log(neighbors)
         neighbors.map((neighbor) => {

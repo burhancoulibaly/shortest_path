@@ -91,23 +91,23 @@ function Map(props) {
             // console.time()
             switch (menuState.algorithm) {
                 case "astar":
-                    states = AStar(memState.rows, memState.cols, memState.grid, menuState.heuristic, memState, setState);
+                    states = AStar(memState.rows, memState.cols, memState.grid, menuState.heuristic, memState, setState, menuState.cutCorners, menuState.allowDiags);
 
                     break;
                 case "dijkstra":
-                    states = Dijkstra(memState.rows, memState.cols, memState.grid, memState, setState);
+                    states = Dijkstra(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
 
                     break;
                 case "bfs":
-                    states = BFS(memState.rows, memState.cols, memState.grid, memState, setState);
+                    states = BFS(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
 
                     break;
                 case "dfs":
-                    states = DFS(memState.rows, memState.cols, memState.grid, memState, setState);
+                    states = DFS(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
 
                     break;
                 case "greedybfs":
-                    states = GreedyBFS(memState.rows, memState.cols, memState.grid, menuState.heuristic, memState, setState);
+                    states = GreedyBFS(memState.rows, memState.cols, memState.grid, menuState.heuristic, memState, setState, menuState.cutCorners, menuState.allowDiags);
 
                     break;
                 default:
@@ -137,7 +137,7 @@ function Map(props) {
 
             return dispatch({type: "complete"});
         }
-    }, [menuState.run, menuState.heuristic, menuState.algorithm, memState.grid, memState.rows, memState.cols, memState, drawPath, dispatch]);
+    }, [menuState.run, menuState.heuristic, menuState.cutCorners, menuState.allowDiags, menuState.algorithm, memState.grid, memState.rows, memState.cols, memState, drawPath, dispatch]);
 
     
     const renderSquare = (x,y,val) => {

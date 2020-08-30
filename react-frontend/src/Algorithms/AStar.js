@@ -61,7 +61,7 @@ function getPoints(gridMap){
     return [startPoint, endPoints];
 }
 
-function getNeighbors(point, gridMap, rows, cols){
+function getNeighbors(point, gridMap, rows, cols, cutCorners, allowDiags){
     //Point                                 Index
     // left point.x-1, point.y              (point.x-1) + (point.y * cols)
     // right point.x+1, point.y             (point.x+1) + (point.y * cols)
@@ -71,7 +71,6 @@ function getNeighbors(point, gridMap, rows, cols){
     // top right point.x+1, point.y-1       (point.x+1) + (point.y-1 * cols)
     // bottom left point.x-1, point.y+1     (point.x-1) + (point.y+1 * cols)
     // bottom right point.x+1, point.y+1    (point.x+1) + (point.y+1 * cols)
-
     const neighbors = new Array(8);
 
     if(point.x > 0){
@@ -106,35 +105,67 @@ function getNeighbors(point, gridMap, rows, cols){
         const topLeft = getIndex((point.x-1), (point.y-1), cols);
 
         if(gridMap[topLeft].type !== "wall" && gridMap[topLeft].type !== "start"){
-            neighbors[4] = gridMap[topLeft];
+            if(allowDiags){
+                if(!cutCorners){
+                    if(gridMap[topLeft+1].type !== "wall" && gridMap[topLeft+50].type !== "wall"){
+                        neighbors[4] = gridMap[topLeft];
+                    }
+                }else{
+                    neighbors[4] = gridMap[topLeft];
+                }
+            }
         }
     }
     if(point.x < cols-1 && point.y > 0){
         const topRight = getIndex((point.x+1), (point.y-1), cols);
 
         if(gridMap[topRight].type !== "wall" && gridMap[topRight].type !== "start"){
-            neighbors[5] = gridMap[topRight];
+            if(allowDiags){
+                if(!cutCorners){
+                    if(gridMap[topRight-1].type !== "wall" && gridMap[topRight+50].type !== "wall"){
+                        neighbors[5] = gridMap[topRight];
+                    }
+                }else{
+                    neighbors[5] = gridMap[topRight];
+                }
+            }
         }
     }
     if(point.x > 0 && point.y < rows-1){
         const bottomLeft  = getIndex((point.x-1), (point.y+1), cols);
 
         if(gridMap[bottomLeft].type !== "wall" && gridMap[bottomLeft].type !== "start"){
-            neighbors[6] = gridMap[bottomLeft];
+            if(allowDiags){
+                if(!cutCorners){
+                    if(gridMap[bottomLeft+1].type !== "wall" && gridMap[bottomLeft-50].type !== "wall"){
+                        neighbors[6] = gridMap[bottomLeft];
+                    }
+                }else{
+                    neighbors[6] = gridMap[bottomLeft];
+                }
+            }
         }
     }
     if(point.x < cols-1 && point.y < rows-1){
         const bottomRight = getIndex((point.x+1), (point.y+1), cols);
 
         if(gridMap[bottomRight].type !== "wall" && gridMap[bottomRight].type !== "start"){
-            neighbors[7] = gridMap[bottomRight];
+            if(allowDiags){
+                if(!cutCorners){
+                    if(gridMap[bottomRight-1].type !== "wall" && gridMap[bottomRight-50].type !== "wall"){
+                        neighbors[7] = gridMap[bottomRight];
+                    }
+                }else{
+                    neighbors[7] = gridMap[bottomRight]
+                }
+            }
         }
     }
 
     return neighbors;
 }
 
-function AStar(rows, cols, gridMap, heuristicType, memState, setState){
+function AStar(rows, cols, gridMap, heuristicType, memState, setState, cutCorners, allowDiags){
     const [startPoint, endPoints] = getPoints(gridMap);
     const openSet = new MinHeap();
     const cameFrom = {};
@@ -257,7 +288,7 @@ function AStar(rows, cols, gridMap, heuristicType, memState, setState){
 
         // console.log(current); 
 
-        const neighbors = getNeighbors(current, gridMap, rows, cols);
+        const neighbors = getNeighbors(current, gridMap, rows, cols, cutCorners, allowDiags);
 
         neighbors.map((neighbor) => {
             // console.log(neighbor);

@@ -11,7 +11,9 @@ function init(initialState){
         run: initialState.run,
         heuristic: initialState.heuristic,
         algorithm: initialState.algorithm,
-        pathClear: initialState.pathClear
+        pathClear: initialState.pathClear,
+        cutCorners: initialState.cutCorners,
+        allowDiags: initialState.allowDiags
     }
 }
 
@@ -35,8 +37,12 @@ function reducer(menuState, action){
             return {...menuState, run: true};
         case 'complete':
             return {...menuState, run: false};
+        case 'cutCorners':
+            return {...menuState, cutCorners: !menuState.cutCorners};
+        case 'allowDiags':
+            return {...menuState, allowDiags: !menuState.allowDiags};
         case 'reset':
-            return init(action.payload);
+            return init(action.payload.init);
         default:
             throw new Error("Not a valid action");
     }
@@ -52,6 +58,8 @@ function Sandbox() {
         clear: false,
         pathClear: false,
         run: false,
+        cutCorners: false,
+        allowDiags: true,
     }
 
     const [menuState, dispatch] = useReducer(reducer, initialState, init)
@@ -81,7 +89,9 @@ function Sandbox() {
                 <Map 
                     winDimensions={winDimensions}
                 />
-                <Menu />
+                <Menu 
+                    initialState={initialState}
+                />
             </MenuContext.Provider>
         </div>
     );
