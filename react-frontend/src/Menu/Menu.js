@@ -19,6 +19,7 @@ function Menu({initialState}){
             <button onClick={() => dispatch({type: 'setHeuristic', payload: { heuristic: "euclidean" }})}>Euclidean Distance</button>
             <button onClick={() => dispatch({type: 'cutCorners'})}>Cutting Corners</button>
             <button onClick={() => dispatch({type: 'allowDiags'})}>Diagonals</button>
+            <button onClick={() => dispatch({type: 'biDirectional'})}>Bi-Directional</button>
             <button onClick={() => dispatch({type: 'pathClear'})}>Clear Path</button>
             <button onClick={() => dispatch({type: 'clear'})}>Clear</button>
             <button onClick={() => dispatch({type: 'run'})}>Run</button>

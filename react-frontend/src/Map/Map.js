@@ -3,10 +3,14 @@ import './Map.css';
 import Square from '../Square/Square';
 import MenuContext from '../MenuContext';
 import AStar from '../Algorithms/AStar';
+import AStarBiDirectional from '../Algorithms/Bi-Directional/AStar';
 import Dijkstra from '../Algorithms/Dijkstra';
+import DijkstraBiDirectional from '../Algorithms/Bi-Directional/Dijkstra';
 import BFS from '../Algorithms/BFS';
+import BFSBiDirectional from '../Algorithms/Bi-Directional/BFS';
 import DFS from '../Algorithms/DFS';
 import GreedyBFS from '../Algorithms/GreedyBFS';
+import GreedyBFSBiDirectional from '../Algorithms/Bi-Directional/GreedyBFS';
 
 
 function Map(props) {
@@ -89,31 +93,60 @@ function Map(props) {
 
             // Visualize path finding algorithm logic
             // console.time()
-            switch (menuState.algorithm) {
-                case "astar":
-                    states = AStar(memState.rows, memState.cols, memState.grid, menuState.heuristic, memState, setState, menuState.cutCorners, menuState.allowDiags);
-
-                    break;
-                case "dijkstra":
-                    states = Dijkstra(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
-
-                    break;
-                case "bfs":
-                    states = BFS(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
-
-                    break;
-                case "dfs":
-                    states = DFS(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
-
-                    break;
-                case "greedybfs":
-                    states = GreedyBFS(memState.rows, memState.cols, memState.grid, menuState.heuristic, memState, setState, menuState.cutCorners, menuState.allowDiags);
-
-                    break;
-                default:
-                    console.log("Must choose a path finding algorithm")
-                    break;
+            if(menuState.biDirectional === true){
+                switch (menuState.algorithm) {
+                    case "astar":
+                        states = AStarBiDirectional(memState.rows, memState.cols, memState.grid, menuState.heuristic, memState, setState, menuState.cutCorners, menuState.allowDiags);
+    
+                        break;
+                    case "dijkstra":
+                        states = DijkstraBiDirectional(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
+    
+                        break;
+                    case "bfs":
+                        states = BFSBiDirectional(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
+    
+                        break;
+                    case "dfs":
+                        states = DFS(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
+    
+                        break;
+                    case "greedybfs":
+                        states = GreedyBFSBiDirectional(memState.rows, memState.cols, memState.grid, menuState.heuristic, memState, setState, menuState.cutCorners, menuState.allowDiags);
+    
+                        break;
+                    default:
+                        console.log("Must choose a path finding algorithm")
+                        break;
+                }
+            }else{
+                switch (menuState.algorithm) {
+                    case "astar":
+                        states = AStar(memState.rows, memState.cols, memState.grid, menuState.heuristic, memState, setState, menuState.cutCorners, menuState.allowDiags);
+    
+                        break;
+                    case "dijkstra":
+                        states = Dijkstra(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
+    
+                        break;
+                    case "bfs":
+                        states = BFS(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
+    
+                        break;
+                    case "dfs":
+                        states = DFS(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
+    
+                        break;
+                    case "greedybfs":
+                        states = GreedyBFS(memState.rows, memState.cols, memState.grid, menuState.heuristic, memState, setState, menuState.cutCorners, menuState.allowDiags);
+    
+                        break;
+                    default:
+                        console.log("Must choose a path finding algorithm")
+                        break;
+                }
             }
+            
             // console.timeEnd()
             
             states
@@ -137,7 +170,7 @@ function Map(props) {
 
             return dispatch({type: "complete"});
         }
-    }, [menuState.run, menuState.heuristic, menuState.cutCorners, menuState.allowDiags, menuState.algorithm, memState.grid, memState.rows, memState.cols, memState, drawPath, dispatch]);
+    }, [menuState.run, menuState.heuristic, menuState.cutCorners, menuState.allowDiags, menuState.algorithm, menuState.biDirectional, memState.grid, memState.rows, memState.cols, memState, drawPath, dispatch]);
 
     
     const renderSquare = (x,y,val) => {

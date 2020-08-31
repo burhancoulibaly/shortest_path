@@ -13,7 +13,8 @@ function init(initialState){
         algorithm: initialState.algorithm,
         pathClear: initialState.pathClear,
         cutCorners: initialState.cutCorners,
-        allowDiags: initialState.allowDiags
+        allowDiags: initialState.allowDiags,
+        biDirectional: initialState.biDirectional
     }
 }
 
@@ -41,6 +42,8 @@ function reducer(menuState, action){
             return {...menuState, cutCorners: !menuState.cutCorners};
         case 'allowDiags':
             return {...menuState, allowDiags: !menuState.allowDiags};
+        case 'biDirectional':
+            return {...menuState, biDirectional: !menuState.biDirectional};
         case 'reset':
             return init(action.payload.init);
         default:
@@ -60,6 +63,7 @@ function Sandbox() {
         run: false,
         cutCorners: false,
         allowDiags: true,
+        biDirectional: false
     }
 
     const [menuState, dispatch] = useReducer(reducer, initialState, init)
