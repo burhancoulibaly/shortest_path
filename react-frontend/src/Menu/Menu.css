@@ -1,0 +1,43 @@
+.sb-menu{
+    height: 100%;
+    background-color: gray;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.sb-menu-container{
+    border-radius: 15px;
+    margin-top: 2rem;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.sb-menu .sb-menu-container .itemType-btns{
+    margin-top: 1rem;
+}
+.sb-menu .sb-menu-container .map-settings{
+    margin-bottom: 1rem;
+}
+.sb-menu .sb-menu-container .itemType-btns,
+.sb-menu .sb-menu-container .algorithm-settings,
+.sb-menu .sb-menu-container .path-settings,
+.sb-menu .sb-menu-container .map-settings{
+    display: flex;
+    justify-content: space-between;
+    padding: .50rem 1rem;
+}
+.sb-menu .sb-menu-container .algorithm-settings select:first-child{
+    margin-right: 1rem;
+}
+
+.sb-menu .sb-menu-container .itemType-btns button.active{
+    background-color: gray;
+    color: white;
+}
+
+.sb-menu .sb-menu-container > button:last-child{
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    padding: .50rem 0;
+}
