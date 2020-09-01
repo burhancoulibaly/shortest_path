@@ -216,11 +216,58 @@ function cleanUserDB(refreshToken){
     });
 }
 
+function saveMap(username, map){
+    return new Promise(async(resolve, reject) => {
+        const userRef = db.collection('user').doc(username).collection("maps").doc();
+        const userMapsRef = db.collection('user_maps').doc();
+
+        try {
+            await userMapsRef.set({
+                name: userMapsRef.id,
+                map: map,
+                owner: username,
+                highest_score: null,
+                second_highest_score: null,
+                third_highest_score: null,
+            }); 
+
+            await userRef.set({
+                map: userMapsRef
+            })
+
+            resolve("User map saved");
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+function getUsersMaps(username){
+    return new Promise(async(resolve, reject) => {
+        try {
+            const response = await db.collection('user').doc(username).collection("maps").get();
+
+            const maps = await Promise.all(await response.docs.map(async(doc) => {
+                const data = doc.data();
+                const map = (await data.map.get()).data();
+
+                return map;
+            }));
+
+            resolve(maps);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
 module.exports = {
     login,
     register,
     revokeTokens,
     refreshToken,
     cleanUserDB,
-    guest
+    guest,
+    saveMap,
+    getUsersMaps
 }

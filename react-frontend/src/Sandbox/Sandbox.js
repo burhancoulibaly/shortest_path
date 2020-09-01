@@ -14,7 +14,9 @@ function init(initialState){
         pathClear: initialState.pathClear,
         cutCorners: initialState.cutCorners,
         allowDiags: initialState.allowDiags,
-        biDirectional: initialState.biDirectional
+        biDirectional: initialState.biDirectional,
+        isResetting: initialState.isResetting,
+        isSaving: initialState.isSaving
     }
 }
 
@@ -45,13 +47,17 @@ function reducer(menuState, action){
         case 'biDirectional':
             return {...menuState, biDirectional: !menuState.biDirectional};
         case 'reset':
+            return {...menuState, isResetting: !menuState.isResetting};
+        case 'save':
+            return {...menuState, isSaving: !menuState.isSaving};
+        case 'initialize':
             return init(action.payload.init);
         default:
             throw new Error("Not a valid action");
     }
 }
 
-function Sandbox() {
+function Sandbox(props) {
     const [winDimensions, setWinDimensions] = useState({ width: document.documentElement.clientWidth, height: document.documentElement.clientHeight });
 
     const initialState = {
@@ -63,7 +69,9 @@ function Sandbox() {
         run: false,
         cutCorners: false,
         allowDiags: true,
-        biDirectional: false
+        biDirectional: false,
+        isResetting: false,
+        isSaving: false
     }
 
     const [menuState, dispatch] = useReducer(reducer, initialState, init)
@@ -92,6 +100,7 @@ function Sandbox() {
             <MenuContext.Provider value={menu}>
                 <Map 
                     winDimensions={winDimensions}
+                    userMap={props.location.state ? props.location.state.userMap : null}
                 />
                 <Menu 
                     initialState={initialState}

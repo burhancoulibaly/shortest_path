@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import './Menu.css';
 import MenuContext from "../MenuContext";
+import UserContext from "../UserContext";
 
 const onAlgorithmChange = (algorithm, dispatch) => {
-    console.log(algorithm);
     dispatch({type: 'setAlgorithm', payload: { algorithm: algorithm }})
 }
 
@@ -12,6 +12,7 @@ const onHeuristicChange = (heuristic, dispatch) => {
 }
 
 function Menu({initialState}){
+    const {user} = useContext(UserContext);
     const {menuState, dispatch} = useContext(MenuContext);
 
     return (
@@ -35,13 +36,6 @@ function Menu({initialState}){
                         <option value="euclidean">Euclidean Distance</option>
                     </select>
                 </div>
-                {/* <button onClick={() => dispatch({type: 'setAlgorithm', payload: { algorithm: "astar" }})}>A*</button>
-                <button onClick={() => dispatch({type: 'setAlgorithm', payload: { algorithm: "dijkstra" }})}>Dijkstra</button>
-                <button onClick={() => dispatch({type: 'setAlgorithm', payload: { algorithm: "bfs" }})}>Breadth First Search</button>
-                <button onClick={() => dispatch({type: 'setAlgorithm', payload: { algorithm: "dfs" }})}>Depth First Search</button>
-                <button onClick={() => dispatch({type: 'setAlgorithm', payload: { algorithm: "greedybfs" }})}>Greedy Best First Search</button>
-                <button onClick={() => dispatch({type: 'setHeuristic', payload: { heuristic: "manhattan" }})}>Manhattan Distance</button>
-                <button onClick={() => dispatch({type: 'setHeuristic', payload: { heuristic: "euclidean" }})}>Euclidean Distance</button> */}
                 <div className="path-settings">
                     <div>
                         <label htmlFor="cutCorners">Cut Corners</label>
@@ -59,7 +53,8 @@ function Menu({initialState}){
                 <div className="map-settings">
                     <button onClick={() => dispatch({type: 'pathClear'})}>Clear Path</button>
                     <button onClick={() => dispatch({type: 'clear'})}>Clear</button>
-                    <button onClick={() => dispatch({type: 'reset', payload: {init: initialState}})}>Reset Menu</button>
+                    <button className={(user.role === "guest" ? "disabled" : "")} disabled={user.role === "guest"} onClick={() => dispatch({type: 'save'})}>Save</button>
+                    <button onClick={() => dispatch({type: 'reset', payload: {init: initialState}})}>Reset</button>
                 </div>
                 <button onClick={() => dispatch({type: 'run'})}>Run</button>
             </div>

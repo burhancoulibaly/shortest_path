@@ -343,9 +343,6 @@ function AStarBiDirectional(rows, cols, gridMap, heuristicType, memState, setSta
         const neighbors1 = getNeighbors(current1, gridMap, rows, cols, cutCorners, allowDiags);
         const neighbors2 = getNeighbors(current2, gridMap, rows, cols, cutCorners, allowDiags);
 
-        console.log("neighbors1", neighbors1);
-        console.log("neighbors2", neighbors2);
-
         neighbors1.map((neighbor) => {
             // console.log(neighbor);
             // console.log((gScore1[getIndex(current1.x, current1.y, cols)] + dist(current1, neighbor)) + heuristic(neighbor, goal));

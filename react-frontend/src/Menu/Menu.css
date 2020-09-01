@@ -41,3 +41,7 @@
     border-bottom-right-radius: 15px;
     padding: .50rem 0;
 }
+
+.sb-menu .sb-menu-container .map-settings .disabled{
+    pointer-events: none;
+}

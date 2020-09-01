@@ -1,5 +1,9 @@
 import React, { useState, useContext, useEffect, useMemo, useCallback } from 'react';
+import UserContext from "../UserContext";
+import { useMutation } from '@apollo/client';
+import MapHelper from '../Helpers/MapHelper';
 import './Map.css';
+
 import Square from '../Square/Square';
 import MenuContext from '../MenuContext';
 import AStar from '../Algorithms/AStar';
@@ -14,19 +18,22 @@ import GreedyBFSBiDirectional from '../Algorithms/Bi-Directional/GreedyBFS';
 
 
 function Map(props) {
+    const {user} = useContext(UserContext);
     const {menuState, dispatch} = useContext(MenuContext);
     const [state, setState] = useState({
         rows: 15,
         cols: 50,
-        grid: new Array(15*50).fill({val: false, type: null}).map((square, i) => {
+        grid: props.userMap ? Array.from(props.userMap) : new Array(15*50).fill({val: false, type: null}).map((square, i) => {
             return {
                 ...square,
                 x: i % 50,
                 y: Math.abs((i - (i % 50)) / 50)
             }
         }),//space-time O(1)
-        itemState: menuState.itemState
+        itemState: menuState.itemState,
+        userMap: props.userMap ? Array.from(props.userMap) : null
     })
+    const [saveMap, { error: saveMapError, data: saveMapData }] = useMutation(MapHelper.saveMap);
 
     const { state: memState } = useMemo(() => ({state}), [state])
 
@@ -39,6 +46,36 @@ function Map(props) {
             }
         })
     }, [menuState.itemState]);
+
+    useEffect(() => {
+        if(menuState.isResetting === true){
+            if(memState.userMap){
+                setState((memState) => ({
+                    ...memState,
+                    grid: memState.grid.map((square, index) => {
+                        if(square !== memState.userMap[index]){
+                            return {...memState.userMap[index]}
+                        }
+                
+                        return {...square}
+                    }) 
+                }))
+                return dispatch({type: "reset"});
+            }
+
+            setState((memState) => ({
+                ...memState,
+                grid: new Array(15*50).fill({val: false, type: null}).map((square, i) => {
+                    return {
+                        ...square,
+                        x: i % 50,
+                        y: Math.abs((i - (i % 50)) / 50)
+                    }
+                })
+            }))
+            return dispatch({type: "reset"});
+        }
+    }, [menuState.isResetting, memState.userMap, dispatch]);
 
     //If menu clear button is clicked
     useEffect(() => {
@@ -73,6 +110,47 @@ function Map(props) {
             return dispatch({type: "pathCleared"});
         }
     }, [menuState.pathClear, dispatch]);
+
+    useEffect(() => {
+        if(menuState.isSaving){
+            //saving map
+            const map = Array.from(memState.grid);
+
+            map.forEach((square, index) => {
+                if(square.type === "path" || square.type === "openset" || square.type === "neighbors"){
+                    map[index] = {...map[index], val: false, type: null};
+                }
+
+                return {...map[index]};
+            })
+            
+            console.log(map);
+
+            saveMap({
+                variables: {
+                    username: user.username,
+                    map: map
+                }
+            })
+        }
+        
+    }, [menuState.isSaving, memState.grid, user.username, saveMap, dispatch])
+
+    useEffect(() => {
+        if(menuState.isSaving){
+            
+            if(saveMapError){
+                console.log(saveMapError);
+                return dispatch({type: "save"});
+            }
+            
+            if(saveMapData){
+                console.log(saveMapData);
+                return dispatch({type: "save"});
+            }
+        }
+        
+    }, [menuState.isSaving, saveMapError, saveMapData, dispatch])
     
     const drawPath = useCallback((newState) => {
         setTimeout(() => {

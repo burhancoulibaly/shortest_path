@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import './LoginPage.css';
-import AuthHelper from '../Auth Helpers/AuthHelper';
+import AuthHelper from '../Helpers/AuthHelper';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import { Redirect } from 'react-router-dom'
 import UserContext from "../UserContext";

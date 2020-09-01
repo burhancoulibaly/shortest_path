@@ -1,5 +1,7 @@
 #sandbox{
     height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 #sandbox *, #sandbox *::before, #sandbox *::after{
     box-sizing: border-box;
