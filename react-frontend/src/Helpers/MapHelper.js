@@ -2,8 +2,16 @@ import { gql } from '@apollo/client';
 
 const Map = {
     saveMap: gql(`
-                mutation saveMap($username: String!, $map: [SquareObject!]) {
-                    saveMap(username: $username, map: $map){
+                mutation saveMap($username: String!, $mapName: String!, $map: [SquareObject!]) {
+                    saveMap(username: $username, mapName: $mapName, map: $map){
+                        response_type,
+                        response
+                    }
+                },
+            `),
+    editMap: gql(`
+                mutation editMap($username: String!, $mapNameOrig: String!, $mapNameEdit: String!, $map: [SquareObject!]) {
+                    editMap(username: $username, mapNameOrig: $mapNameOrig, mapNameEdit: $mapNameEdit, map: $map){
                         response_type,
                         response
                     }

@@ -34,7 +34,7 @@ function Map(props) {
         userMap: props.userMap ? Array.from(props.userMap) : null
     })
     const [saveMap, { error: saveMapError, data: saveMapData }] = useMutation(MapHelper.saveMap);
-
+    const [editMap, { error: editMapError, data: editMapData }] = useMutation(MapHelper.editMap);
     const { state: memState } = useMemo(() => ({state}), [state])
 
     //If item button is changed
@@ -113,28 +113,87 @@ function Map(props) {
 
     useEffect(() => {
         if(menuState.isSaving){
-            //saving map
-            const map = Array.from(memState.grid);
+            console.log(menuState.isEdit)
+            if(menuState.isEdit){
+                const map = Array.from(memState.grid);
 
-            map.forEach((square, index) => {
-                if(square.type === "path" || square.type === "openset" || square.type === "neighbors"){
-                    map[index] = {...map[index], val: false, type: null};
-                }
+                map.forEach((square, index) => {
+                    if(square.type === "path" || square.type === "openset" || square.type === "neighbors"){
+                        map[index] = {...map[index], val: false, type: null};
+                    }
 
-                return {...map[index]};
-            })
+                    return {...map[index]};
+                })
+                
+                console.log(map);
+                console.log(menuState.mapName);
+                console.log(user.username, menuState.mapName[0], menuState.mapName[menuState.mapName.length-1], map);
+                editMap({
+                    variables: {
+                        username: user.username,
+                        mapNameOrig: menuState.mapName[0],
+                        mapNameEdit: menuState.mapName[menuState.mapName.length-1],
+                        map: map
+                    }
+                })
+            }else{
+                //saving map
+                const map = Array.from(memState.grid);
+
+                map.forEach((square, index) => {
+                    if(square.type === "path" || square.type === "openset" || square.type === "neighbors"){
+                        map[index] = {...map[index], val: false, type: null};
+                    }
+
+                    return {...map[index]};
+                })
+                
+                console.log(map);
+                console.log(menuState.mapName);
+                saveMap({
+                    variables: {
+                        username: user.username,
+                        mapName: menuState.mapName[menuState.mapName.length-1],
+                        map: map
+                    }
+                })
+            }
+        }
+    }, [menuState.isSaving, menuState.mapName, menuState.isEdit, memState.grid, user.username, saveMap, editMap, dispatch])
+
+    useEffect(() => {
+        if(menuState.isSaving){
             
-            console.log(map);
+            if(editMapError){
+                console.log(editMapError);
+                return dispatch({type: "save"});
+            }
+            
+            if(editMapData){
+                console.log(editMapData);
+                const currentMapName = menuState.mapName[menuState.mapName.length-1];
+                const map = Array.from(memState.grid);
 
-            saveMap({
-                variables: {
-                    username: user.username,
-                    map: map
-                }
-            })
+                map.forEach((square, index) => {
+                    if(square.type === "path" || square.type === "openset" || square.type === "neighbors"){
+                        map[index] = {...map[index], val: false, type: null};
+                    }
+
+                    return {...map[index]};
+                })
+
+                dispatch({type: "save"});
+                dispatch({type: "mapNameReset"});
+                dispatch({type: "mapName", payload: { mapName: currentMapName }});
+
+                return setState((memState) => ({
+                    ...memState,
+                    userMap: map
+                })); 
+            }
         }
         
-    }, [menuState.isSaving, memState.grid, user.username, saveMap, dispatch])
+    }, [menuState.isSaving, menuState.mapName, memState.grid, editMapError, editMapData, dispatch])
 
     useEffect(() => {
         if(menuState.isSaving){
@@ -146,11 +205,29 @@ function Map(props) {
             
             if(saveMapData){
                 console.log(saveMapData);
-                return dispatch({type: "save"});
+                const currentMapName = menuState.mapName[menuState.mapName.length-1];
+                const map = Array.from(memState.grid);
+
+                map.forEach((square, index) => {
+                    if(square.type === "path" || square.type === "openset" || square.type === "neighbors"){
+                        map[index] = {...map[index], val: false, type: null};
+                    }
+
+                    return {...map[index]};
+                })
+
+                dispatch({type: "save"});
+                dispatch({type: "mapNameReset"});
+                dispatch({type: "mapName", payload: { mapName: currentMapName }});
+
+                return setState((memState) => ({
+                    ...memState,
+                    userMap: map
+                }));
             }
         }
         
-    }, [menuState.isSaving, saveMapError, saveMapData, dispatch])
+    }, [menuState.isSaving, menuState.mapName, memState.grid, saveMapError, saveMapData, dispatch])
     
     const drawPath = useCallback((newState) => {
         setTimeout(() => {

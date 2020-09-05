@@ -16,7 +16,9 @@ function init(initialState){
         allowDiags: initialState.allowDiags,
         biDirectional: initialState.biDirectional,
         isResetting: initialState.isResetting,
-        isSaving: initialState.isSaving
+        isSaving: initialState.isSaving,
+        mapName: initialState.mapName,
+        isEdit: initialState.isEdit
     }
 }
 
@@ -24,6 +26,10 @@ function reducer(menuState, action){
     switch (action.type) {
         case 'setItemState':
             return {...menuState, itemState: action.payload.itemState}
+        case 'mapName':
+            return {...menuState, mapName: [...menuState.mapName, action.payload.mapName]}
+        case 'mapNameReset':
+            return {...menuState, mapName: []}
         case 'setHeuristic':
             return {...menuState, heuristic: action.payload.heuristic}
         case 'setAlgorithm':
@@ -50,6 +56,8 @@ function reducer(menuState, action){
             return {...menuState, isResetting: !menuState.isResetting};
         case 'save':
             return {...menuState, isSaving: !menuState.isSaving};
+        case 'edit':
+            return {...menuState, isEdit: true};
         case 'initialize':
             return init(action.payload.init);
         default:
@@ -71,12 +79,22 @@ function Sandbox(props) {
         allowDiags: true,
         biDirectional: false,
         isResetting: false,
-        isSaving: false
+        isSaving: false,
+        mapName: [],
+        isEdit: false
     }
 
     const [menuState, dispatch] = useReducer(reducer, initialState, init)
 
     const menu = useMemo(() => ({menuState, dispatch}), [menuState, dispatch]);
+
+    if(!menuState.mapName.length > 0){
+        if(props.location.state){
+            menu.dispatch({type: "edit"});
+            menu.dispatch({type: "mapName", payload: { mapName: props.location.state.mapName }});
+        }
+    }
+    console.log(menu.menuState.mapName, menu.menuState.mapName[0], menu.menuState.mapName[menuState.mapName.length-1])
 
     useEffect(() => {
         const handleWinResize = () => {

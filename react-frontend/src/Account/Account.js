@@ -37,7 +37,7 @@ function Account() {
       {maps && 
         maps.map((map, index) => {
           return (
-            <Link key={index} to={{pathname: "/sandbox", state: { userMap: map.map }}}>
+            <Link key={index} to={{pathname: "/sandbox", state: { userMap: map.map, mapName: map.name }}}>
               <div>
                   <h3>{map.name}</h3>
               </div>

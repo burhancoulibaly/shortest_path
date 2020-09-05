@@ -216,14 +216,14 @@ function cleanUserDB(refreshToken){
     });
 }
 
-function saveMap(username, map){
+function saveMap(username, mapName, map){
     return new Promise(async(resolve, reject) => {
-        const userRef = db.collection('user').doc(username).collection("maps").doc();
-        const userMapsRef = db.collection('user_maps').doc();
+        const userRef = db.collection('user').doc(username).collection("maps").doc(mapName);
+        const userMapsRef = db.collection('user_maps').doc(mapName);
 
         try {
             await userMapsRef.set({
-                name: userMapsRef.id,
+                name: mapName,
                 map: map,
                 owner: username,
                 highest_score: null,
@@ -236,6 +236,42 @@ function saveMap(username, map){
             })
 
             resolve("User map saved");
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+function editMap(username, mapNameOrig, mapNameEdit, map){
+    return new Promise(async(resolve, reject) => {
+        const origUserRef = db.collection('user').doc(username).collection("maps").doc(mapNameOrig);
+        const origUserMapsRef = db.collection('user_maps').doc(mapNameOrig);
+
+        try {
+            await origUserRef.delete();
+            await origUserMapsRef.delete();
+        }catch (error) {
+            reject(error);
+        }
+
+        const editUserRef = db.collection('user').doc(username).collection("maps").doc(mapNameEdit);
+        const editUserMapsRef = db.collection('user_maps').doc(mapNameEdit);
+        
+        try {
+            await editUserMapsRef.set({
+                name: mapNameEdit,
+                map: map,
+                owner: username,
+                highest_score: null,
+                second_highest_score: null,
+                third_highest_score: null,
+            }); 
+
+            await editUserRef.set({
+                map: editUserMapsRef
+            })
+
+            resolve("User map edited");
         } catch (error) {
             reject(error);
         }
@@ -269,5 +305,6 @@ module.exports = {
     cleanUserDB,
     guest,
     saveMap,
+    editMap,
     getUsersMaps
 }

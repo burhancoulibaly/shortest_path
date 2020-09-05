@@ -11,7 +11,8 @@ const typeDefs = `
     }
 
     extend type Mutation {
-        saveMap(username: String!, map: [SquareObject!]): Response!
+        saveMap(username: String!, mapName: String!, map: [SquareObject!]): Response!
+        editMap(username: String!, mapNameOrig: String!, mapNameEdit: String!, map: [SquareObject!]): Response!
     }
 
     input SquareObject {
@@ -81,9 +82,24 @@ const resolvers = {
         },
     },
     Mutation: {
-        saveMap: async(_, { username, map }, {req}) => {
+        saveMap: async(_, { username, mapName, map }, {req}) => {
             try { 
-                response = await db.saveMap(username, map); 
+                response = await db.saveMap(username, mapName, map); 
+
+                return {
+                    response_type: `Success`,
+                    response: `${response}`,
+                }
+            } catch (error) {
+                return {
+                    response_type: error.toString().split(":")[0].replace(" ",""),
+                    response: error.toString().split(":")[1].replace(" ",""),
+                }
+            }      
+        },
+        editMap: async(_, { username, mapNameOrig, mapNameEdit, map }, {req}) => {
+            try { 
+                response = await db.editMap(username, mapNameOrig, mapNameEdit, map); 
 
                 return {
                     response_type: `Success`,

@@ -13,9 +13,6 @@
     flex-direction: column;
     justify-content: center;
 }
-.sb-menu .sb-menu-container .itemType-btns{
-    margin-top: 1rem;
-}
 .sb-menu .sb-menu-container .map-settings{
     margin-bottom: 1rem;
 }
@@ -25,7 +22,7 @@
 .sb-menu .sb-menu-container .map-settings{
     display: flex;
     justify-content: space-between;
-    padding: .50rem 1rem;
+    padding: .75rem 1rem;
 }
 .sb-menu .sb-menu-container .algorithm-settings select:first-child{
     margin-right: 1rem;
@@ -44,4 +41,11 @@
 
 .sb-menu .sb-menu-container .map-settings .disabled{
     pointer-events: none;
+}
+
+.sb-menu .sb-menu-container .mapname,
+.sb-menu .sb-menu-container .editname{
+    padding: 1rem;
+    width: 100%;
+    text-align: center;
 }
