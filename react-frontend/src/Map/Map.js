@@ -162,6 +162,7 @@ function Map(props) {
     }, [menuState.isSaving, menuState.mapName, menuState.isEdit, memState.grid, user.username, saveMap, editMap, dispatch])
 
     useEffect(() => {
+        if(menuState.isEdit){
         if(menuState.isSaving){
             
             if(editMapError){
@@ -192,10 +193,12 @@ function Map(props) {
                 })); 
             }
         }
+        }
         
-    }, [menuState.isSaving, menuState.mapName, memState.grid, editMapError, editMapData, dispatch])
+    }, [menuState.isSaving, menuState.mapName, menuState.isEdit, memState.grid, editMapError, editMapData, dispatch])
 
     useEffect(() => {
+        if(!menuState.isEdit){
         if(menuState.isSaving){
             
             if(saveMapError){
@@ -220,14 +223,11 @@ function Map(props) {
                 dispatch({type: "mapNameReset"});
                 dispatch({type: "mapName", payload: { mapName: currentMapName }});
 
-                return setState((memState) => ({
-                    ...memState,
-                    userMap: map
-                }));
+                
             }
         }
-        
-    }, [menuState.isSaving, menuState.mapName, memState.grid, saveMapError, saveMapData, dispatch])
+        }
+    }, [menuState.isSaving, menuState.mapName, menuState.isEdit, memState.grid, saveMapError, saveMapData, dispatch])
     
     const drawPath = useCallback((newState) => {
         setTimeout(() => {

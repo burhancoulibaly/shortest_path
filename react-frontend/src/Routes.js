@@ -140,6 +140,7 @@ function Routes() {
 
     //will only recompute the memoized value when one of the dependencies has changed
     const userState = useMemo(() => ({user, setUser}), [user, setUser]);
+    localStorage.setItem('accessToken', userState.user ? userState.user.accessToken : "");
 
     //To make sure tokenRefresh attempt is only made once.
     useEffect(() => {

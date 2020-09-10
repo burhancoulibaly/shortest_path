@@ -17,9 +17,18 @@ const Map = {
                     }
                 },
             `),
+    deleteMap: gql(`
+                mutation deleteMap($username: String!, $mapName: String!) {
+                    deleteMap(username: $username, mapName: $mapName){
+                        response_type,
+                        response
+                    }
+                },
+            `),
     getUsersMaps: gql(`
                 query getUsersMaps($username: String!) {
                     getUsersMaps(username: $username){
+                        owner,
                         name,
                         map{
                             val,

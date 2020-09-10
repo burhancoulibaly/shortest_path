@@ -85,8 +85,11 @@ function  SaveMap({mapName, dispatch, ...props}){
     }
 
     const handleSave = (mapName) => {
+        //change isEdit to true, after this is done
         handleClose();
+        dispatch({type: "mapName", payload: { mapName: mapName }});
         dispatch({type: "save"});
+        dispatch({type: "edit"});
     }
 
     return (

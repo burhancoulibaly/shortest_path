@@ -221,7 +221,11 @@ function saveMap(username, mapName, map){
         const userRef = db.collection('user').doc(username).collection("maps").doc(mapName);
         const userMapsRef = db.collection('user_maps').doc(mapName);
 
-        try {
+        try { 
+            if(await db.collection('user').doc(username).collection("maps").doc(mapName).get){
+                throw new Error("A map with this name already exist");
+            }
+
             await userMapsRef.set({
                 name: mapName,
                 map: map,
@@ -278,6 +282,22 @@ function editMap(username, mapNameOrig, mapNameEdit, map){
     });
 }
 
+function deleteMap(username, mapName){
+    return new Promise(async(resolve, reject) => {
+        const userRef = db.collection('user').doc(username).collection("maps").doc(mapName);
+        const userMapsRef = db.collection('user_maps').doc(mapName);
+
+        try {
+            await userRef.delete();
+            await userMapsRef.delete();
+
+            resolve("Map successfully deleted");
+        }catch (error) {
+            reject(error);
+        }
+    });
+}
+
 function getUsersMaps(username){
     return new Promise(async(resolve, reject) => {
         try {
@@ -292,6 +312,7 @@ function getUsersMaps(username){
 
             resolve(maps);
         } catch (error) {
+            console.log(error);
             reject(error);
         }
     });
@@ -306,5 +327,6 @@ module.exports = {
     guest,
     saveMap,
     editMap,
+    deleteMap,
     getUsersMaps
 }

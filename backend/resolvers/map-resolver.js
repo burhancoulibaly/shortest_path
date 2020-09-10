@@ -1,6 +1,5 @@
 const { createAccessToken, createRefreshToken } = require('../auth'),
       db = require('../db');
-const { map } = require('lodash');
       
 const typeDefs = `
     extend type Query {
@@ -13,6 +12,7 @@ const typeDefs = `
     extend type Mutation {
         saveMap(username: String!, mapName: String!, map: [SquareObject!]): Response!
         editMap(username: String!, mapNameOrig: String!, mapNameEdit: String!, map: [SquareObject!]): Response!
+        deleteMap(username: String!, mapName: String!): Response!
     }
 
     input SquareObject {
@@ -30,6 +30,7 @@ const typeDefs = `
     } 
     
     type Map {
+        owner: String!
         name: String!
         map: [Square]!
         highscore_one: String
@@ -41,7 +42,13 @@ const typeDefs = `
 const resolvers = {
     Query: {
         getUserMap: async(_, { mapId }, { req }) => {
+            if(req.payload.response_type !== "authenticated"){
+                throw new Error("User not authenticated");
+            }
+
             return {
+                owner: "",
+                name: "",
                 map: {
                     val: false,
                     type: ``,
@@ -54,6 +61,10 @@ const resolvers = {
             }
         },
         getUsersMaps: async(_, { username }, { req }) => {
+            if(req.payload.response_type !== "authenticated"){
+                throw new Error("User not authenticated");
+            }
+
             try {
                 const maps = await db.getUsersMaps(username);
 
@@ -65,7 +76,13 @@ const resolvers = {
             }
         },
         getAllUserMaps: async(_, data, { req }) => {
+            if(req.payload.response_type !== "authenticated"){
+                throw new Error("User not authenticated");
+            }
+
             return {
+                owner: "",
+                name: "",
                 map: [],
                 highscore_one: ``,
                 highscore_two: ``,
@@ -73,7 +90,13 @@ const resolvers = {
             }
         },
         get10PathsMaps: async(_, data, { req }) => {
+            if(req.payload.response_type !== "authenticated"){
+                throw new Error("User not authenticated");
+            }
+
             return {
+                owner: "",
+                name: "",
                 map: [],
                 highscore_one: ``,
                 highscore_two: ``,
@@ -83,6 +106,10 @@ const resolvers = {
     },
     Mutation: {
         saveMap: async(_, { username, mapName, map }, {req}) => {
+            if(req.payload.response_type !== "authenticated" || req.payload.response.username !== username){
+                throw new Error("User not authenticated");
+            }
+
             try { 
                 response = await db.saveMap(username, mapName, map); 
 
@@ -98,6 +125,10 @@ const resolvers = {
             }      
         },
         editMap: async(_, { username, mapNameOrig, mapNameEdit, map }, {req}) => {
+            if(req.payload.response_type !== "authenticated" || req.payload.response.username !== username){
+                throw new Error("User not authenticated");
+            }
+
             try { 
                 response = await db.editMap(username, mapNameOrig, mapNameEdit, map); 
 
@@ -111,6 +142,25 @@ const resolvers = {
                     response: error.toString().split(":")[1].replace(" ",""),
                 }
             }      
+        },
+        deleteMap: async(_, { username, mapName }, {req}) => {
+            if(req.payload.response_type !== "authenticated" || req.payload.response.username !== username){
+                throw new Error("User not authenticated");
+            }
+
+            try { 
+                response = await db.deleteMap(username, mapName); 
+
+                return {
+                    response_type: `Success`,
+                    response: `${response}`,
+                }
+            } catch (error) {
+                return {
+                    response_type: error.toString().split(":")[0].replace(" ",""),
+                    response: error.toString().split(":")[1].replace(" ",""),
+                }
+            } 
         }
     }
 };

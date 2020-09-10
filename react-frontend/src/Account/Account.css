@@ -1,0 +1,59 @@
+#account .links-container{
+    padding: 5rem 10rem;
+}
+
+#account .links-container .link-container{
+    height: 200px;
+    border: 3px solid #ddd;
+    display: flex;
+    margin-bottom: 3rem;
+}
+
+#account .links-container .link-container .map-preview{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-right: 3px solid #ddd;
+    width: 25%;
+    background: gray;
+}
+
+#account .links-container .link-container .map-info{
+    width: 60%;
+    padding: 1rem;
+}
+
+#account .links-container .link-container .map-edit{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-left: 3px solid #ddd;
+    width: 15%;
+}
+
+#account .links-container .link-container .map-edit > button{
+    width: 100%;
+    height: 33.3%;
+    border-radius: 0;
+}
+
+#account .links-container .link-container .map-edit a,
+#account .links-container .link-container .map-edit a:link,
+#account .links-container .link-container .map-edit a:visited,
+#account .links-container .link-container .map-edit a:hover,
+#account .links-container .link-container .map-edit a:active{
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    width: 100%;
+    height: 33.3%;
+}
+
+#account .links-container .link-container .map-edit a > button{
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
+    border-radius: 0;
+    width: 100%;
+    height: 100%;
+}
