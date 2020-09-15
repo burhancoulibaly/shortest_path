@@ -12,16 +12,19 @@ function TopNav(props) {
 
         <h5 className="app-name">Shortest Path</h5>
 
-        { user && <Dropdown className="user-dropdown">
-          <Dropdown.Toggle variant="secondary" id="dropdown-basic">
-            {user.username}
-          </Dropdown.Toggle>
+        { user &&
+          <Dropdown className="user-dropdown">
+            <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+              {user.username}
+            </Dropdown.Toggle>
 
-          <Dropdown.Menu>
-            <Dropdown.Item href="/account">My Account</Dropdown.Item>
-            <Dropdown.Item href="#" onClick={() => props.logout(setUser)}>Logout</Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>}
+            <Dropdown.Menu>
+              { user.role === "authenticated" &&
+                <Dropdown.Item href="/account">My Account</Dropdown.Item>
+              }
+              <Dropdown.Item href="#" onClick={() => props.logout(setUser)}>Logout</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>}
     </div>
   );
 }

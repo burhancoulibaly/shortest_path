@@ -166,9 +166,9 @@ function DijkstraBiDirectional(rows, cols, gridMap, memState, setState, cutCorne
 
     let goal = endPoints[0];
 
-    if(!startPoint || !endPoints){
+    if(!startPoint || endPoints.length === 0){
         console.log("Map must have a start point, and an end point");
-        return "Map must have a start point, and an end point"; 
+        return null; 
     }
 
     gridMap.map((square, index) => {

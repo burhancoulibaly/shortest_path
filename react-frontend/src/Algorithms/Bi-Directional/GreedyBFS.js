@@ -183,9 +183,9 @@ function GreedyBFSBiDirectional(rows, cols, gridMap, heuristicType, memState, se
 
     let goal = null;
 
-    if(!startPoint || !endPoints){
+    if(!startPoint || endPoints.length === 0){
         console.log("Map must have a start point, and an end point");
-        return "Map must have a start point, and an end point"; 
+        return null; 
     }
 
     cameFromLeft[getIndex(startPoint.x, startPoint.y, cols)] = null;

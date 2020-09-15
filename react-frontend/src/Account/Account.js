@@ -24,7 +24,7 @@ function EditMapModal({mapName, handleNameEdit, ...props}){
               <form className="editmap">
                   <div className="form-group">
                       <label htmlFor="mapname">Map Name</label>
-                      <input type="mapname" className="form-control" id="mapname" aria-describedby="mapNameHelp" type="text" defaultValue={ mapName } placeholder="Unamed"/>
+                      <input className="form-control" id="mapname" aria-describedby="mapNameHelp" type="text" defaultValue={ mapName } placeholder="Unamed"/>
                   </div>
               </form>
           </Modal.Body>
@@ -132,7 +132,7 @@ function Account() {
   return (
     <div id="account">
       {user &&
-        <h1>{user.username}</h1>
+        <h1 className="username">{user.username}</h1>
       }
       <div className="links-container">
       {maps && 
@@ -148,6 +148,28 @@ function Account() {
                         <h3>{map.name}</h3>
                     </div>
                   </Link>
+                </div>
+                <div className="top-users">
+                  <div className="title">
+                    Top 3 Users
+                  </div>
+                  <ol>
+                    {map.highest_score &&
+                      <li>
+                        {map.highest_score}
+                      </li>
+                    }
+                    {map.second_highest_score &&
+                      <li>
+                        {map.second_highest_score}
+                      </li>
+                    }
+                    {map.third_highest_score &&
+                      <li>
+                        {map.third_highest_score}
+                      </li>
+                    }
+                  </ol>
                 </div>
                 { user.username === map.owner &&
                   <div className="map-edit">

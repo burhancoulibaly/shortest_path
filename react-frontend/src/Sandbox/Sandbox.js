@@ -3,6 +3,8 @@ import './Sandbox.css';
 import Map from '../Map/Map';
 import Menu from '../Menu/Menu';
 import MenuContext from '../MenuContext';
+import { useLazyQuery } from '@apollo/client';
+import MapHelper from '../Helpers/MapHelper';
 
 function init(initialState){
     return {
@@ -18,7 +20,7 @@ function init(initialState){
         isResetting: initialState.isResetting,
         isSaving: initialState.isSaving,
         mapName: initialState.mapName,
-        isEdit: initialState.isEdit
+        isEdit: initialState.isEdit,
     }
 }
 
@@ -81,20 +83,42 @@ function Sandbox(props) {
         isResetting: false,
         isSaving: false,
         mapName: [],
-        isEdit: false
+        isEdit: false,
     }
 
-    const [menuState, dispatch] = useReducer(reducer, initialState, init)
+    const [menuState, dispatch] = useReducer(reducer, initialState, init);
+    const [fetchedMap, setFetchedMap] = useState(null);
 
     const menu = useMemo(() => ({menuState, dispatch}), [menuState, dispatch]);
 
-    if(!menuState.mapName.length > 0){
-        if(props.location.state){
-            menu.dispatch({type: "edit"});
-            menu.dispatch({type: "mapName", payload: { mapName: props.location.state.mapName }});
-        }
-    }
-    console.log(menu.menuState.mapName, menu.menuState.mapName[0], menu.menuState.mapName[menuState.mapName.length-1])
+    const [getUserMap, { error: getUserMapError, loading: getUserMapLoading, data: getUserMapData }] = useLazyQuery(MapHelper.getUserMap);
+    
+    useEffect(() => {
+        if(parseInt(localStorage.getItem("mapVersion")) !== 0){
+            if(getUserMapError){
+                console.log(getUserMapError);
+            }
+    
+            if(getUserMapLoading){
+                console.log(getUserMapLoading);
+                dispatch({type: "mapNameReset"});
+                dispatch({type: "mapName", payload: { mapName: "..." }});
+            }
+    
+            if(getUserMapData){
+                console.log("data retrieved")
+                dispatch({type: "edit"});
+                dispatch({type: "mapNameReset"});
+                dispatch({type: "mapName", payload: { mapName: getUserMapData.getUserMap.name }});
+    
+                setFetchedMap((fetchedMap) => {
+                    return getUserMapData.getUserMap.map;
+                })
+
+                localStorage.setItem("mapVersion", 0);
+            }
+        }  
+    }, [getUserMapError, getUserMapLoading, getUserMapData, dispatch]);
 
     useEffect(() => {
         const handleWinResize = () => {
@@ -113,12 +137,48 @@ function Sandbox(props) {
         };
     })
 
+    if(!menu.menuState.mapName.length > 0){
+        if(props.history.action === "PUSH"){
+            localStorage.removeItem("map");
+            localStorage.removeItem("mapVersion");
+        }
+
+        if(props.location.state){
+            localStorage.setItem("mapVersion", 0);
+            localStorage.setItem("map", JSON.stringify(props.location.state));
+
+            menu.dispatch({type: "edit"});
+            menu.dispatch({type: "mapName", payload: { mapName: props.location.state.mapName }});
+
+            setFetchedMap((fetchedMap) => {
+                return JSON.parse(localStorage.getItem("map")).userMap;
+            })
+        }else if(localStorage.getItem("map")){
+            if(parseInt(localStorage.getItem("mapVersion")) !== 0){
+                getUserMap({
+                    variables: {
+                        mapName: JSON.parse(localStorage.getItem("map")).mapName
+                    }
+                })
+            }else{
+                menu.dispatch({type: "edit"});
+                menu.dispatch({type: "mapName", payload: { mapName: JSON.parse(localStorage.getItem("map")).mapName }});
+
+                setFetchedMap((fetchedMap) => {
+                    return JSON.parse(localStorage.getItem("map")).userMap;
+                })
+            }
+        }
+    }
+
+    console.log(menu.menuState.mapName, menu.menuState.mapName[0], menu.menuState.mapName[menuState.mapName.length-1]);
+
     return (
         <div id="sandbox">
             <MenuContext.Provider value={menu}>
                 <Map 
                     winDimensions={winDimensions}
-                    userMap={props.location.state ? props.location.state.userMap : null}
+                    userMap={fetchedMap}
                 />
                 <Menu 
                     initialState={initialState}

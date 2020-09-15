@@ -188,9 +188,9 @@ function AStar(rows, cols, gridMap, heuristicType, memState, setState, cutCorner
 
     let goal = null;
 
-    if(!startPoint || !endPoints){
+    if(!startPoint || endPoints.length === 0){
         console.log("Map must have a start point, and an end point");
-        return "Map must have a start point, and an end point"; 
+        return null; 
     }
 
     cameFrom[getIndex(startPoint.x, startPoint.y, cols)] = null;

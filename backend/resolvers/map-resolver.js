@@ -3,7 +3,7 @@ const { createAccessToken, createRefreshToken } = require('../auth'),
       
 const typeDefs = `
     extend type Query {
-        getUserMap(mapId: String!): Map!
+        getUserMap(mapName: String!): Map!
         getUsersMaps(username: String!): [Map!]
         getAllUserMaps: [Map!]
         get10PathsMaps: [Map!]
@@ -33,31 +33,27 @@ const typeDefs = `
         owner: String!
         name: String!
         map: [Square]!
-        highscore_one: String
-        highscore_two: String
-        highscore_three: String
+        highest_score: String,
+        second_highest_score: String,
+        third_highest_score: String,
     }
 `;
 
 const resolvers = {
     Query: {
-        getUserMap: async(_, { mapId }, { req }) => {
+        getUserMap: async(_, { mapName }, { req }) => {
             if(req.payload.response_type !== "authenticated"){
                 throw new Error("User not authenticated");
             }
 
-            return {
-                owner: "",
-                name: "",
-                map: {
-                    val: false,
-                    type: ``,
-                    x: 0,
-                    y: 0
-                },
-                highscore_one: ``,
-                highscore_two: ``,
-                highscore_three: ``
+            try {
+                const map = await db.getUserMap(mapName);
+                
+                return map;
+            } catch (error) {
+                console.log(error);
+
+                throw error;
             }
         },
         getUsersMaps: async(_, { username }, { req }) => {

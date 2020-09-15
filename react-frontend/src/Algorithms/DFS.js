@@ -158,9 +158,9 @@ function DFS(rows, cols, gridMap, memState, setState, cutCorners, allowDiags){
 
     const goal = endPoints[0];
 
-    if(!startPoint || !endPoints){
+    if(!startPoint || endPoints.length === 0){
         console.log("Map must have a start point, and an end point");
-        return "Map must have a start point, and an end point"; 
+        return null; 
     }
 
     points[getIndex(startPoint.x, startPoint.y, cols)] = startPoint;

@@ -37,6 +37,34 @@ function Map(props) {
     const [editMap, { error: editMapError, data: editMapData }] = useMutation(MapHelper.editMap);
     const { state: memState } = useMemo(() => ({state}), [state])
 
+    // console.log(memState.userMap)
+
+    useEffect(() => {
+        if(memState.userMap === null){
+            setState((memState) => {
+                return {
+                    ...memState,
+                    userMap: props.userMap ? Array.from(props.userMap) : memState.userMap,
+                }
+            })
+        }
+    }, [props.userMap, memState.userMap])
+
+    useEffect(() => {
+        setState((memState) => {
+            return {
+                ...memState,
+                grid: memState.userMap ? Array.from(memState.userMap) : new Array(15*50).fill({val: false, type: null}).map((square, i) => {
+                    return {
+                        ...square,
+                        x: i % 50,
+                        y: Math.abs((i - (i % 50)) / 50)
+                    }
+                }),
+            }
+        })
+    }, [memState.userMap])
+
     //If item button is changed
     useEffect(() => {
         setState((memState) => {
@@ -157,6 +185,12 @@ function Map(props) {
                         map: map
                     }
                 })
+
+                localStorage.setItem("mapVersion", 0);
+                localStorage.setItem("map", JSON.stringify({
+                    mapName: menuState.mapName[menuState.mapName.length-1],
+                    userMap: map
+                }));
             }
         }
     }, [menuState.isSaving, menuState.mapName, menuState.isEdit, memState.grid, user.username, saveMap, editMap, dispatch])
@@ -186,6 +220,8 @@ function Map(props) {
                 dispatch({type: "save"});
                 dispatch({type: "mapNameReset"});
                 dispatch({type: "mapName", payload: { mapName: currentMapName }});
+                localStorage.setItem("mapVersion", parseInt(localStorage.getItem("mapVersion")) + 1);
+                console.log(parseInt(localStorage.getItem("mapVersion")));
 
                 return setState((memState) => ({
                     ...memState,
@@ -222,8 +258,6 @@ function Map(props) {
                 dispatch({type: "save"});
                 dispatch({type: "mapNameReset"});
                 dispatch({type: "mapName", payload: { mapName: currentMapName }});
-
-                
             }
         }
         }
@@ -303,6 +337,10 @@ function Map(props) {
             }
             
             // console.timeEnd()
+
+            if(states === null){
+                return dispatch({type: "complete"});
+            }
             
             states
             .filter((newState, index) => {

@@ -298,6 +298,21 @@ function deleteMap(username, mapName){
     });
 }
 
+function getUserMap(mapName){
+    return new Promise(async(resolve, reject) => {
+        try {
+            const response = await db.collection('user_maps').doc(mapName).get();
+
+            if(response){
+                resolve(response.data());
+            }
+        } catch (error) {
+            console.log(error);
+            reject(error);
+        }
+    });
+}
+
 function getUsersMaps(username){
     return new Promise(async(resolve, reject) => {
         try {
@@ -328,5 +343,6 @@ module.exports = {
     saveMap,
     editMap,
     deleteMap,
+    getUserMap,
     getUsersMaps
 }

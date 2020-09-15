@@ -29,7 +29,7 @@ function SaveMapModal({mapName, handleSave, ...props}){
                 <form className="savemap">
                     <div className="form-group">
                         <label htmlFor="mapname">Map Name</label>
-                        <input type="mapname" className="form-control" id="mapname" aria-describedby="mapNameHelp" type="text" defaultValue={ mapName[mapName.length-1] } placeholder="Unamed"/>
+                        <input className="form-control" id="mapname" aria-describedby="mapNameHelp" type="text" defaultValue={ mapName[mapName.length-1] } placeholder="Unamed"/>
                     </div>
                 </form>
             </Modal.Body>
@@ -57,7 +57,7 @@ function EditMapModal({mapName, handleNameEdit, ...props}){
                 <form className="editmap">
                     <div className="form-group">
                         <label htmlFor="mapname">Map Name</label>
-                        <input type="mapname" className="form-control" id="mapname" aria-describedby="mapNameHelp" type="text" defaultValue={ mapName[mapName.length-1] } placeholder="Unamed"/>
+                        <input className="form-control" id="mapname" aria-describedby="mapNameHelp" type="text" defaultValue={ mapName[mapName.length-1] } placeholder="Unamed"/>
                     </div>
                 </form>
             </Modal.Body>
@@ -90,6 +90,7 @@ function  SaveMap({mapName, dispatch, ...props}){
         dispatch({type: "mapName", payload: { mapName: mapName }});
         dispatch({type: "save"});
         dispatch({type: "edit"});
+        localStorage.setItem("mapVersion", 0);
     }
 
     return (
@@ -143,6 +144,8 @@ function  EditMapName({menuState, dispatch, ...props}){
 function Menu({initialState, ...props}){
     const {user} = useContext(UserContext);
     const {menuState, dispatch} = useContext(MenuContext);
+
+    
 
     return (
         <div className="sb-menu">

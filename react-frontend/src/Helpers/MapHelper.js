@@ -25,6 +25,24 @@ const Map = {
                     }
                 },
             `),
+    getUserMap: gql(`
+                query getUserMap($mapName: String!) {
+                    getUserMap(mapName: $mapName) {
+                        owner,
+                        name,
+                        map{
+                            val,
+                            type,
+                            x,
+                            y
+                        },
+                        highest_score,
+                        second_highest_score,
+                        third_highest_score,
+                    }
+                }
+
+            `),
     getUsersMaps: gql(`
                 query getUsersMaps($username: String!) {
                     getUsersMaps(username: $username){
@@ -36,9 +54,9 @@ const Map = {
                             x,
                             y
                         },
-                        highscore_one,
-                        highscore_two,
-                        highscore_three
+                        highest_score,
+                        second_highest_score,
+                        third_highest_score,
                     }
                 },
             `),
