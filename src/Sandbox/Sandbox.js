@@ -120,7 +120,6 @@ function Sandbox(props) {
     }, [getUserMapError, getUserMapLoading, getUserMapData, dispatch]);
 
     useEffect(() => {
-        console.log(document.documentElement.clientWidth, document.documentElement.clientHeight)
         const handleWinResize = () => {
             setWinDimensions({
                 width: document.documentElement.clientWidth,
@@ -154,8 +153,8 @@ function Sandbox(props) {
                 return JSON.parse(localStorage.getItem("map")).userMap;
             })
         }else if(localStorage.getItem("map")){
-            console.log(parseInt(localStorage.getItem("mapVersion")));
-            console.log(JSON.parse(localStorage.getItem("map")));
+            // console.log(parseInt(localStorage.getItem("mapVersion")));
+            // console.log(JSON.parse(localStorage.getItem("map")));
 
             if(parseInt(localStorage.getItem("mapVersion")) !== 0){
                 getUserMap({

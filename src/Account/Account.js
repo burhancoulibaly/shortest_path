@@ -15,10 +15,9 @@ function EditMapModal({mapName, handleNameEdit, ...props}){
   })
 
   const validateNameEdit = (mapName) => {
-    console.log(mapName)
     const isValid = InputValidationHelper.validateString(mapName);
 
-    console.log(isValid)
+    // console.log(isValid)
     setInputState({
       ...inputState,
       isMapNameValid: isValid,
@@ -74,7 +73,7 @@ function  EditMapName({map, user, refetch, ...props}){
     }
     
     if(editMapData){
-      console.log(editMapData);
+      // console.log(editMapData);
       refetch();
     }
   }, [editMapError, editMapData, refetch])
@@ -90,7 +89,7 @@ function  EditMapName({map, user, refetch, ...props}){
   const handleNameEdit = (mapName) => {
     handleClose();
     
-    console.log(user.username, map.name, mapName, map)
+    // console.log(user.username, map.name, mapName, map)
     editMap({
       variables: {
         username: user.username,
@@ -139,7 +138,7 @@ function Account() {
     }
 
     if(mapsData){
-      console.log(mapsData.getUsersMaps);
+      // console.log(mapsData.getUsersMaps);
 
       setMaps((maps) => {
         return mapsData.getUsersMaps;
@@ -153,7 +152,7 @@ function Account() {
     }
 
     if(deleteMapData){
-      console.log(deleteMapData);
+      // console.log(deleteMapData);
 
 
       refetch();

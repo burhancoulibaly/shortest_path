@@ -22,7 +22,7 @@ function SaveMapModal({mapName, handleSave, ...props}){
     const validateNameEdit = (mapName) => {
         const isValid = InputValidationHelper.validateString(mapName);
     
-        console.log(isValid)
+        // console.log(isValid)
         setInputState({
           ...inputState,
           isMapNameValid: isValid,
@@ -75,7 +75,7 @@ function EditMapModal({mapName, handleNameEdit, ...props}){
     })
 
     const validateNameEdit = (mapName) => {
-        console.log(mapName)
+        // console.log(mapName)
         const isValid = InputValidationHelper.validateString(mapName);
 
         setInputState({
@@ -127,7 +127,7 @@ function  SaveMap({mapName, dispatch, ...props}){
     const [modalShow, setModalShow] = React.useState(false);
 
     const handleShow = () => {
-        console.log(mapName)
+        // console.log(mapName)
         if(mapName.length > 0){
             dispatch({type: "save"});
         }else{

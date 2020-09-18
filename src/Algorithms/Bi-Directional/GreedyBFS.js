@@ -260,11 +260,11 @@ function GreedyBFSBiDirectional(rows, cols, gridMap, heuristicType, memState, se
             })
         }
         states.push(newState);
-        console.log(closedSetFromLeft);
-        console.log(closedSetFromRight);
+        // console.log(closedSetFromLeft);
+        // console.log(closedSetFromRight);
         if(cameFromLeft[getIndex(current2.x, current2.y, cols)] || cameFromRight[getIndex(current1.x, current1.y, cols)]){
-            console.log(cameFromLeft)
-            console.log(cameFromRight)
+            // console.log(cameFromLeft)
+            // console.log(cameFromRight)
             let cameFromLeftPoint;
             let cameFromRightPoint;
 
@@ -334,7 +334,7 @@ function GreedyBFSBiDirectional(rows, cols, gridMap, heuristicType, memState, se
 
                 if(current1HScore < hScore[getIndex(neighbor.x, neighbor.y, cols)] || !hScore[getIndex(neighbor.x, neighbor.y, cols)]){
                     cameFromLeft[getIndex(neighbor.x, neighbor.y, cols)] = current1;//<---
-                    console.log(cameFromLeft);
+                    // console.log(cameFromLeft);
                     hScore[getIndex(neighbor.x, neighbor.y, cols)] = current1HScore;
 
                     if(!openSetFromLeft.find(hScore[getIndex(neighbor.x, neighbor.y, cols)], neighbor)){//See <---
@@ -372,7 +372,7 @@ function GreedyBFSBiDirectional(rows, cols, gridMap, heuristicType, memState, se
 
                 if(current2HScore < hScore[getIndex(neighbor.x, neighbor.y, cols)] || !hScore[getIndex(neighbor.x, neighbor.y, cols)]){
                     cameFromRight[getIndex(neighbor.x, neighbor.y, cols)] = current2;//<---
-                    console.log(cameFromRight);
+                    // console.log(cameFromRight);
                     hScore[getIndex(neighbor.x, neighbor.y, cols)] = current2HScore;
 
                     if(!openSetFromRight.find(hScore[getIndex(neighbor.x, neighbor.y, cols)], neighbor)){//See <---

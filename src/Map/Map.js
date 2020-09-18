@@ -141,7 +141,6 @@ function Map(props) {
 
     useEffect(() => {
         if(menuState.isSaving){
-            console.log(menuState.isEdit)
             if(menuState.isEdit){
                 const map = Array.from(state.grid);
 
@@ -153,9 +152,9 @@ function Map(props) {
                     return {...map[index]};
                 })
                 
-                console.log(map);
-                console.log(menuState.mapName);
-                console.log(user.username, menuState.mapName[0], menuState.mapName[menuState.mapName.length-1], map);
+                // console.log(map);
+                // console.log(menuState.mapName);
+                // console.log(user.username, menuState.mapName[0], menuState.mapName[menuState.mapName.length-1], map);
                 editMap({
                     variables: {
                         username: user.username,
@@ -176,8 +175,8 @@ function Map(props) {
                     return {...map[index]};
                 })
                 
-                console.log(map);
-                console.log(menuState.mapName);
+                // console.log(map);
+                // console.log(menuState.mapName);
                 saveMap({
                     variables: {
                         username: user.username,
@@ -199,7 +198,7 @@ function Map(props) {
                 }
                 
                 if(editMapData){
-                    console.log(editMapData);
+                    // console.log(editMapData);
                     const currentMapName = menuState.mapName[menuState.mapName.length-1];
                     const map = Array.from(state.grid);
 
@@ -239,7 +238,7 @@ function Map(props) {
                 }
                 
                 if(saveMapData){
-                    console.log(saveMapData);
+                    // console.log(saveMapData);
                     const currentMapName = menuState.mapName[menuState.mapName.length-1];
                     const map = Array.from(state.grid);
 
@@ -413,10 +412,10 @@ function Map(props) {
 
         const currentMap = !userMap ? state.grid : userMap;
 
-        if(userMap){
-            console.log(currentMap);
-            console.log(state.grid);
-        }
+        // if(userMap){
+            // console.log(currentMap);
+            // console.log(state.grid);
+        // }
 
         //time O(n)
         for(let i = 0; i < currentMap.length; i++){

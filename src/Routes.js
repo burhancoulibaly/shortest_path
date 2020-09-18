@@ -46,7 +46,7 @@ const logout = (setUser) => {
             return;
         })
         .catch((error) => {
-            console.log(error.data);
+            // console.log(error.data);
             updateUser(error.data, setUser);
 
             return;
@@ -122,7 +122,7 @@ function Routes() {
     //Stores user data if user is logged in and null if user isn't logged in
     const [user, setUser] = useState();
 
-    console.log(user);
+    // console.log(user);
 
     //Adds headers to every axios request(requests)
     axios.interceptors.request.use(

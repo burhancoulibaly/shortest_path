@@ -9,7 +9,6 @@ import UserContext from "../UserContext";
 //Todo move this function to its own file
 //Returns login form based on login tab
 const LoginForm = (props) => {
-  console.log(props.loginTab);
   const [inputLoginState, setInputLoginState] = useState({
     isUsernameValid: true,
     usernameErrorMessage: "",
@@ -34,7 +33,7 @@ const LoginForm = (props) => {
   const validateGuest = (e, username) => {
     const isUsernameValid = InputValidationHelper.validateUsername(username);
 
-    console.log(isUsernameValid)
+    // console.log(isUsernameValid)
     setInputGuestState({
       ...inputGuestState,
       isUsernameValid: isUsernameValid,
@@ -59,7 +58,7 @@ const LoginForm = (props) => {
     const passwordsMatch = InputValidationHelper.validatePasswords(password1, password2);
 
     
-    console.log(isUsernameValid)
+    // console.log(isUsernameValid)
     setInputSignUpState({
       ...inputSignUpState,
       isUsernameValid: isUsernameValid,
@@ -88,7 +87,7 @@ const LoginForm = (props) => {
   const validateLogin = (e, username, password) => {
     const isUsernameValid = InputValidationHelper.validateUsername(username);
 
-    console.log(isUsernameValid)
+    // console.log(isUsernameValid)
     setInputLoginState({
       ...inputLoginState,
       isUsernameValid: isUsernameValid,
@@ -222,7 +221,7 @@ function LoginPage(props) {
         return;
       };
   
-      console.log(guestData);
+      // console.log(guestData);
 
       propsRef.current.updateUser(guestData, setUser);
 
@@ -264,7 +263,7 @@ function LoginPage(props) {
         return;
       };
   
-      console.log(signupData);
+      // console.log(signupData);
 
       propsRef.current.updateUser(signupData, setUser);
 
@@ -307,7 +306,7 @@ function LoginPage(props) {
       };
 
   
-      console.log(loginData.login);
+      // console.log(loginData.login);
 
       propsRef.current.updateUser(loginData.login, setUser);
 
