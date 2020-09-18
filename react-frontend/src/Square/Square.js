@@ -1,16 +1,15 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Square.css';
 
 let downFlag = false;
 
 function Square(props) {
     const [state, setState] = useState({x: props.x, y: props.y, val: props.val, type: props.type});
-    const { state: memState } = useMemo(() => ({state}), [state])
 
     useEffect(() => {
-        setState((memState) => {
+        setState((state) => {
             return {
-                ...memState,
+                ...state,
                 val: props.val,
                 type: props.type
             }
@@ -38,40 +37,40 @@ function Square(props) {
         }
     }
 
-    switch (memState.type) {
+    switch (state.type) {
         case "start":
             return (
-                <div style={{width: `${props.width}px`, height:`${props.height}px`, backgroundColor: props.val === true ? `#28fc86` : `white`}} className="square" onMouseDown={(e) => handler(e,memState.x,memState.y)} onMouseUp={(e) => handler(e)} onMouseOver={(e) => handler(e,memState.x,memState.y)}></div>
+                <div style={{width: `${props.width}px`, height:`${props.height}px`, backgroundColor: props.val === true ? `#28fc86` : `white`}} className="square" onMouseDown={(e) => handler(e,state.x,state.y)} onMouseUp={(e) => handler(e)} onMouseOver={(e) => handler(e,state.x,state.y)}></div>
             )
 
         case "wall":
             return (
-                <div style={{width: `${props.width}px`, height:`${props.height}px`, backgroundColor: props.val === true ? `#c8c6c4` : `white`}} className="square" onMouseDown={(e) => handler(e,memState.x,memState.y)} onMouseUp={(e) => handler(e)} onMouseOver={(e) => handler(e,memState.x,memState.y)}></div>
+                <div style={{width: `${props.width}px`, height:`${props.height}px`, backgroundColor: props.val === true ? `#c8c6c4` : `white`}} className="square" onMouseDown={(e) => handler(e,state.x,state.y)} onMouseUp={(e) => handler(e)} onMouseOver={(e) => handler(e,state.x,state.y)}></div>
             )
 
         case "end":
             return (
-                <div style={{width: `${props.width}px`, height:`${props.height}px`, backgroundColor: props.val === true ? `#ef5350` : `white`}} className="square" onMouseDown={(e) => handler(e,memState.x,memState.y)} onMouseUp={(e) => handler(e)} onMouseOver={(e) => handler(e,memState.x,memState.y)}></div>
+                <div style={{width: `${props.width}px`, height:`${props.height}px`, backgroundColor: props.val === true ? `#ef5350` : `white`}} className="square" onMouseDown={(e) => handler(e,state.x,state.y)} onMouseUp={(e) => handler(e)} onMouseOver={(e) => handler(e,state.x,state.y)}></div>
             )
 
         case "path":
             return (
-                <div style={{width: `${props.width}px`, height:`${props.height}px`, backgroundColor: props.val === true ? `orange` : `white`}} className="square" onMouseDown={(e) => handler(e,memState.x,memState.y)} onMouseUp={(e) => handler(e)} onMouseOver={(e) => handler(e,memState.x,memState.y)}></div>
+                <div style={{width: `${props.width}px`, height:`${props.height}px`, backgroundColor: props.val === true ? `orange` : `white`}} className="square" onMouseDown={(e) => handler(e,state.x,state.y)} onMouseUp={(e) => handler(e)} onMouseOver={(e) => handler(e,state.x,state.y)}></div>
             )
 
         case "neighbors":
             return (
-                <div style={{width: `${props.width}px`, height:`${props.height}px`, backgroundColor: props.val === true ? `lightblue` : `white`}} className="square" onMouseDown={(e) => handler(e,memState.x,memState.y)} onMouseUp={(e) => handler(e)} onMouseOver={(e) => handler(e,memState.x,memState.y)}></div>
+                <div style={{width: `${props.width}px`, height:`${props.height}px`, backgroundColor: props.val === true ? `lightblue` : `white`}} className="square" onMouseDown={(e) => handler(e,state.x,state.y)} onMouseUp={(e) => handler(e)} onMouseOver={(e) => handler(e,state.x,state.y)}></div>
             )
 
         case "openset":
             return (
-                <div style={{width: `${props.width}px`, height:`${props.height}px`, backgroundColor: props.val === true ? `blue` : `white`}} className="square" onMouseDown={(e) => handler(e,memState.x,memState.y)} onMouseUp={(e) => handler(e)} onMouseOver={(e) => handler(e,memState.x,memState.y)}></div>
+                <div style={{width: `${props.width}px`, height:`${props.height}px`, backgroundColor: props.val === true ? `blue` : `white`}} className="square" onMouseDown={(e) => handler(e,state.x,state.y)} onMouseUp={(e) => handler(e)} onMouseOver={(e) => handler(e,state.x,state.y)}></div>
             )
     
         default:
             return (
-                <div style={{width: `${props.width}px`, height:`${props.height}px`, backgroundColor: `white`}} className="square" onMouseDown={(e) => handler(e,memState.x,memState.y)} onMouseUp={(e) => handler(e)} onMouseOver={(e) => handler(e,memState.x,memState.y)}></div>
+                <div style={{width: `${props.width}px`, height:`${props.height}px`, backgroundColor: `white`}} className="square" onMouseDown={(e) => handler(e,state.x,state.y)} onMouseUp={(e) => handler(e)} onMouseOver={(e) => handler(e,state.x,state.y)}></div>
             )
     }
 }

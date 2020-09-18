@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import UserContext from "../UserContext";
 import { useMutation } from '@apollo/client';
 import MapHelper from '../Helpers/MapHelper';
@@ -35,26 +35,26 @@ function Map(props) {
     })
     const [saveMap, { error: saveMapError, data: saveMapData }] = useMutation(MapHelper.saveMap);
     const [editMap, { error: editMapError, data: editMapData }] = useMutation(MapHelper.editMap);
-    const { state: memState } = useMemo(() => ({state}), [state])
+    // const { state: state } = useMemo(() => ({state}), [state])
 
-    // console.log(memState.userMap)
+    // console.log(state.userMap)
 
     useEffect(() => {
-        if(memState.userMap === null){
-            setState((memState) => {
+        if(state.userMap === null){
+            setState((state) => {
                 return {
-                    ...memState,
-                    userMap: props.userMap ? Array.from(props.userMap) : memState.userMap,
+                    ...state,
+                    userMap: props.userMap ? Array.from(props.userMap) : state.userMap,
                 }
             })
         }
-    }, [props.userMap, memState.userMap])
+    }, [props.userMap, state.userMap])
 
     useEffect(() => {
-        setState((memState) => {
+        setState((state) => {
             return {
-                ...memState,
-                grid: memState.userMap ? Array.from(memState.userMap) : new Array(15*50).fill({val: false, type: null}).map((square, i) => {
+                ...state,
+                grid: state.userMap ? Array.from(state.userMap) : new Array(15*50).fill({val: false, type: null}).map((square, i) => {
                     return {
                         ...square,
                         x: i % 50,
@@ -63,13 +63,13 @@ function Map(props) {
                 }),
             }
         })
-    }, [memState.userMap])
+    }, [state.userMap])
 
     //If item button is changed
     useEffect(() => {
-        setState((memState) => {
+        setState((state) => {
             return {
-                ...memState,
+                ...state,
                 itemState: menuState.itemState
             }
         })
@@ -77,12 +77,12 @@ function Map(props) {
 
     useEffect(() => {
         if(menuState.isResetting === true){
-            if(memState.userMap){
-                setState((memState) => ({
-                    ...memState,
-                    grid: memState.grid.map((square, index) => {
-                        if(square !== memState.userMap[index]){
-                            return {...memState.userMap[index]}
+            if(state.userMap){
+                setState((state) => ({
+                    ...state,
+                    grid: state.grid.map((square, index) => {
+                        if(square !== state.userMap[index]){
+                            return {...state.userMap[index]}
                         }
                 
                         return {...square}
@@ -91,8 +91,8 @@ function Map(props) {
                 return dispatch({type: "reset"});
             }
 
-            setState((memState) => ({
-                ...memState,
+            setState((state) => ({
+                ...state,
                 grid: new Array(15*50).fill({val: false, type: null}).map((square, i) => {
                     return {
                         ...square,
@@ -103,14 +103,14 @@ function Map(props) {
             }))
             return dispatch({type: "reset"});
         }
-    }, [menuState.isResetting, memState.userMap, dispatch]);
+    }, [menuState.isResetting, state.userMap, dispatch]);
 
     //If menu clear button is clicked
     useEffect(() => {
         if(menuState.clear === true){
-            setState((memState) => ({
-                ...memState,
-                grid: memState.grid.map((square, index) => {
+            setState((state) => ({
+                ...state,
+                grid: state.grid.map((square, index) => {
                     if(square.type !== "start" && square.type !== "end"){
                         return {...square, val: false, type: null}
                     }
@@ -125,9 +125,9 @@ function Map(props) {
     //If menu clear path button is clicked
     useEffect(() => {
         if(menuState.pathClear === true){
-            setState((memState) => ({
-                ...memState,
-                grid: memState.grid.map((square, index) => {
+            setState((state) => ({
+                ...state,
+                grid: state.grid.map((square, index) => {
                     if(square.type !== "start" && square.type !== "end" && square.type !== "wall"){
                         return {...square, val: false, type: null}
                     }
@@ -143,7 +143,7 @@ function Map(props) {
         if(menuState.isSaving){
             console.log(menuState.isEdit)
             if(menuState.isEdit){
-                const map = Array.from(memState.grid);
+                const map = Array.from(state.grid);
 
                 map.forEach((square, index) => {
                     if(square.type === "path" || square.type === "openset" || square.type === "neighbors"){
@@ -166,7 +166,7 @@ function Map(props) {
                 })
             }else{
                 //saving map
-                const map = Array.from(memState.grid);
+                const map = Array.from(state.grid);
 
                 map.forEach((square, index) => {
                     if(square.type === "path" || square.type === "openset" || square.type === "neighbors"){
@@ -185,83 +185,94 @@ function Map(props) {
                         map: map
                     }
                 })
-
-                localStorage.setItem("mapVersion", 0);
-                localStorage.setItem("map", JSON.stringify({
-                    mapName: menuState.mapName[menuState.mapName.length-1],
-                    userMap: map
-                }));
             }
         }
-    }, [menuState.isSaving, menuState.mapName, menuState.isEdit, memState.grid, user.username, saveMap, editMap, dispatch])
+    }, [menuState.isSaving, menuState.mapName, menuState.isEdit, state.grid, user.username, saveMap, editMap, dispatch])
 
     useEffect(() => {
         if(menuState.isEdit){
-        if(menuState.isSaving){
-            
-            if(editMapError){
-                console.log(editMapError);
-                return dispatch({type: "save"});
+            if(menuState.isSaving){
+                
+                if(editMapError){
+                    console.log(editMapError);
+                    return dispatch({type: "save"});
+                }
+                
+                if(editMapData){
+                    console.log(editMapData);
+                    const currentMapName = menuState.mapName[menuState.mapName.length-1];
+                    const map = Array.from(state.grid);
+
+                    map.forEach((square, index) => {
+                        if(square.type === "path" || square.type === "openset" || square.type === "neighbors"){
+                            map[index] = {...map[index], val: false, type: null};
+                        }
+
+                        return {...map[index]};
+                    })
+
+                    dispatch({type: "save"});
+                    dispatch({type: "mapNameReset"});
+                    dispatch({type: "mapName", payload: { mapName: currentMapName }});
+                    localStorage.setItem("mapVersion", parseInt(localStorage.getItem("mapVersion")) + 1);
+                    console.log(parseInt(localStorage.getItem("mapVersion")));
+
+                    setState((state) => ({
+                        ...state,
+                        userMap: map
+                    }));
+
+                    return;
+                }
             }
-            
-            if(editMapData){
-                console.log(editMapData);
-                const currentMapName = menuState.mapName[menuState.mapName.length-1];
-                const map = Array.from(memState.grid);
-
-                map.forEach((square, index) => {
-                    if(square.type === "path" || square.type === "openset" || square.type === "neighbors"){
-                        map[index] = {...map[index], val: false, type: null};
-                    }
-
-                    return {...map[index]};
-                })
-
-                dispatch({type: "save"});
-                dispatch({type: "mapNameReset"});
-                dispatch({type: "mapName", payload: { mapName: currentMapName }});
-                localStorage.setItem("mapVersion", parseInt(localStorage.getItem("mapVersion")) + 1);
-                console.log(parseInt(localStorage.getItem("mapVersion")));
-
-                return setState((memState) => ({
-                    ...memState,
-                    userMap: map
-                })); 
-            }
-        }
         }
         
-    }, [menuState.isSaving, menuState.mapName, menuState.isEdit, memState.grid, editMapError, editMapData, dispatch])
+    }, [menuState.isSaving, menuState.mapName, menuState.isEdit, state.grid, editMapError, editMapData, dispatch])
 
     useEffect(() => {
         if(!menuState.isEdit){
-        if(menuState.isSaving){
-            
-            if(saveMapError){
-                console.log(saveMapError);
-                return dispatch({type: "save"});
-            }
-            
-            if(saveMapData){
-                console.log(saveMapData);
-                const currentMapName = menuState.mapName[menuState.mapName.length-1];
-                const map = Array.from(memState.grid);
+            if(menuState.isSaving){
+                
+                if(saveMapError){
+                    console.log(saveMapError);
+                    return dispatch({type: "save"});
+                }
+                
+                if(saveMapData){
+                    console.log(saveMapData);
+                    const currentMapName = menuState.mapName[menuState.mapName.length-1];
+                    const map = Array.from(state.grid);
 
-                map.forEach((square, index) => {
-                    if(square.type === "path" || square.type === "openset" || square.type === "neighbors"){
-                        map[index] = {...map[index], val: false, type: null};
-                    }
+                    map.forEach((square, index) => {
+                        if(square.type === "path" || square.type === "openset" || square.type === "neighbors"){
+                            map[index] = {...map[index], val: false, type: null};
+                        }
 
-                    return {...map[index]};
-                })
+                        return {...map[index]};
+                    })
 
-                dispatch({type: "save"});
-                dispatch({type: "mapNameReset"});
-                dispatch({type: "mapName", payload: { mapName: currentMapName }});
+                    dispatch({type: "save"});
+                    dispatch({type: "mapNameReset"});
+                    dispatch({type: "mapName", payload: { mapName: currentMapName }});
+
+                    localStorage.setItem("mapVersion", 0);
+                    localStorage.setItem("map", JSON.stringify({
+                        mapName: currentMapName,
+                        userMap: map
+                    }));
+
+                    dispatch({type: "edit"});
+
+                    setState((state) => ({
+                        ...state,
+                        userMap: map
+                    })); 
+
+                    return;
+                }
             }
         }
-        }
-    }, [menuState.isSaving, menuState.mapName, menuState.isEdit, memState.grid, saveMapError, saveMapData, dispatch])
+    }, [menuState.isSaving, menuState.mapName, menuState.isEdit, state.grid, saveMapError, saveMapData, dispatch])
     
     const drawPath = useCallback((newState) => {
         setTimeout(() => {
@@ -285,23 +296,23 @@ function Map(props) {
             if(menuState.biDirectional === true){
                 switch (menuState.algorithm) {
                     case "astar":
-                        states = AStarBiDirectional(memState.rows, memState.cols, memState.grid, menuState.heuristic, memState, setState, menuState.cutCorners, menuState.allowDiags);
+                        states = AStarBiDirectional(state.rows, state.cols, state.grid, menuState.heuristic, state, setState, menuState.cutCorners, menuState.allowDiags);
     
                         break;
                     case "dijkstra":
-                        states = DijkstraBiDirectional(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
+                        states = DijkstraBiDirectional(state.rows, state.cols, state.grid, state, setState, menuState.cutCorners, menuState.allowDiags);
     
                         break;
                     case "bfs":
-                        states = BFSBiDirectional(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
+                        states = BFSBiDirectional(state.rows, state.cols, state.grid, state, setState, menuState.cutCorners, menuState.allowDiags);
     
                         break;
                     case "dfs":
-                        states = DFS(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
+                        states = DFS(state.rows, state.cols, state.grid, state, setState, menuState.cutCorners, menuState.allowDiags);
     
                         break;
                     case "greedybfs":
-                        states = GreedyBFSBiDirectional(memState.rows, memState.cols, memState.grid, menuState.heuristic, memState, setState, menuState.cutCorners, menuState.allowDiags);
+                        states = GreedyBFSBiDirectional(state.rows, state.cols, state.grid, menuState.heuristic, state, setState, menuState.cutCorners, menuState.allowDiags);
     
                         break;
                     default:
@@ -311,23 +322,23 @@ function Map(props) {
             }else{
                 switch (menuState.algorithm) {
                     case "astar":
-                        states = AStar(memState.rows, memState.cols, memState.grid, menuState.heuristic, memState, setState, menuState.cutCorners, menuState.allowDiags);
+                        states = AStar(state.rows, state.cols, state.grid, menuState.heuristic, state, setState, menuState.cutCorners, menuState.allowDiags);
     
                         break;
                     case "dijkstra":
-                        states = Dijkstra(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
+                        states = Dijkstra(state.rows, state.cols, state.grid, state, setState, menuState.cutCorners, menuState.allowDiags);
     
                         break;
                     case "bfs":
-                        states = BFS(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
+                        states = BFS(state.rows, state.cols, state.grid, state, setState, menuState.cutCorners, menuState.allowDiags);
     
                         break;
                     case "dfs":
-                        states = DFS(memState.rows, memState.cols, memState.grid, memState, setState, menuState.cutCorners, menuState.allowDiags);
+                        states = DFS(state.rows, state.cols, state.grid, state, setState, menuState.cutCorners, menuState.allowDiags);
     
                         break;
                     case "greedybfs":
-                        states = GreedyBFS(memState.rows, memState.cols, memState.grid, menuState.heuristic, memState, setState, menuState.cutCorners, menuState.allowDiags);
+                        states = GreedyBFS(state.rows, state.cols, state.grid, menuState.heuristic, state, setState, menuState.cutCorners, menuState.allowDiags);
     
                         break;
                     default:
@@ -363,59 +374,69 @@ function Map(props) {
 
             return dispatch({type: "complete"});
         }
-    }, [menuState.run, menuState.heuristic, menuState.cutCorners, menuState.allowDiags, menuState.algorithm, menuState.biDirectional, memState.grid, memState.rows, memState.cols, memState, drawPath, dispatch]);
+    }, [menuState.run, menuState.heuristic, menuState.cutCorners, menuState.allowDiags, menuState.algorithm, menuState.biDirectional, state.grid, state.rows, state.cols, state, drawPath, dispatch]);
 
     
-    const renderSquare = (x,y,val) => {
+    const renderSquare = (x,y,val,userMap) => {
+        const rows = state.rows;
+        const cols = state.cols; 
+
         return (
             <Square
                 //Minus 4 accounts for width and height
                 width={
-                    memState.cols > memState.rows
-                        ? (props.winDimensions.width / memState.cols) - 4
-                        : (props.winDimensions.width / memState.cols) * (Math.min((props.winDimensions.width / memState.cols),(props.winDimensions.height / memState.rows)) / Math.max((props.winDimensions.width / memState.cols),(props.winDimensions.height / memState.rows))) - 4 
+                    cols > rows
+                        ? (props.winDimensions.width / cols) - 4
+                        : (props.winDimensions.width / cols) * (Math.min((props.winDimensions.width / cols),(props.winDimensions.height / rows)) / Math.max((props.winDimensions.width / cols),(props.winDimensions.height / rows))) - 4 
                 }
                 height={
-                    memState.rows === memState.cols
-                        ? (props.winDimensions.height / memState.rows) - 4
+                    rows === cols
+                        ? (props.winDimensions.height / rows) - 4
                         //converting aspect ration of the square to 1:1 by multiplying the height by minimum of the width and height divided by the maximum of the width and height
-                        : (props.winDimensions.height / memState.rows) * (Math.min((props.winDimensions.width / memState.cols),(props.winDimensions.height / memState.rows)) / Math.max((props.winDimensions.width / memState.cols),(props.winDimensions.height / memState.rows))) - 4
+                        : (props.winDimensions.height / rows) * (Math.min((props.winDimensions.width / cols),(props.winDimensions.height / rows)) / Math.max((props.winDimensions.width / cols),(props.winDimensions.height / rows))) - 4
                 }
                 x={x}
                 y={y}
                 val={val}
                 squareClick={(x, y) => handleClick(x, y)}
-                type={memState.grid[x + (y * memState.cols)].type}
+                type={userMap[x + (y * cols)].type}
             />
         )
     }
 
-    const renderMap = () => {
+    const renderMap = (userMap) => {
         //TODO: use x y variables set per index for this instead
         //space-time O(1)
-        const rows = Array(memState.rows);
+        const rows = Array(state.rows);
         //each row will contain an array of 50 available indexes
-        const cols = Array(memState.rows);
+        const cols = Array(state.cols);
+
+        const currentMap = !userMap ? state.grid : userMap;
+
+        if(userMap){
+            console.log(currentMap);
+            console.log(state.grid);
+        }
 
         //time O(n)
-        for(let i = 0; i < memState.grid.length; i++){
-            if(i % memState.cols === 0){
-                cols[i / memState.cols] = Array(memState.cols)//space-time O(1)
+        for(let i = 0; i < currentMap.length; i++){
+            if(i % cols.length === 0){
+                cols[i / cols.length] = Array(cols.length)//space-time O(1)
 
                 rows[i] = (
-                    <div className="grid-row" key={i / memState.cols}>
-                        {cols[i / memState.cols]}
+                    <div className="grid-row" key={i / cols.length}>
+                        {cols[i / cols.length]}
                     </div>
                 )
             }
 
             let square = (
                 <div className="grid-col" key={i}>
-                    {renderSquare(i % memState.cols, Math.abs((i - (i % memState.cols)) / memState.cols), memState.grid[i].val)}
+                    {renderSquare(i % cols.length, Math.abs((i - (i % cols.length)) / cols.length), currentMap[i].val, currentMap)}
                 </div>
             )
 
-            cols[(i - (i % memState.cols)) / memState.cols][i % memState.cols] = square;
+            cols[(i - (i % cols.length)) / cols.length][i % cols.length] = square;
         }
 
         const map = rows;
@@ -424,22 +445,22 @@ function Map(props) {
     }
 
     const handleClick = (x,y) => {
-        switch (memState.itemState) {
+        switch (state.itemState) {
             case "start":
-                setState((memState) => ({
-                    ...memState,
+                setState((state) => ({
+                    ...state,
                     //state object is immutable so updates have to be done this way
-                    grid: memState.grid.map((square, index) => {
-                        if(index === x + (y * memState.cols)){
-                            // console.log(x,y,square.type,memState.itemState);
-                            if(square.type === memState.itemState || !square.val){
+                    grid: state.grid.map((square, index) => {
+                        if(index === x + (y * state.cols)){
+                            // console.log(x,y,square.type,state.itemState);
+                            if(square.type === state.itemState || !square.val){
                                 return square.val
                                     ? {...square, val: false, type: null}
-                                    : {...square, val: true, type: memState.itemState}
+                                    : {...square, val: true, type: state.itemState}
                             }
                         }
 
-                        if(square.type === memState.itemState && square.val && !memState.grid[x + (y * memState.cols)].val){
+                        if(square.type === state.itemState && square.val && !state.grid[x + (y * state.cols)].val){
                             return {...square, val: false, type: null}
                         }
 
@@ -450,16 +471,16 @@ function Map(props) {
                 break;
 
             case "wall":
-                setState((memState) => ({
-                    ...memState,
+                setState((state) => ({
+                    ...state,
                     //state object is immutable so updates have to be done this way
-                    grid: memState.grid.map((square, index) => {
-                        if(index === x + (y * memState.cols)){
+                    grid: state.grid.map((square, index) => {
+                        if(index === x + (y * state.cols)){
                             // console.log(x,y,square.type,state.itemState);
-                            if(square.type === memState.itemState || !square.val){
+                            if(square.type === state.itemState || !square.val){
                                 return square.val
                                     ? {...square, val: false, type: null}
-                                    : {...square, val: true, type: memState.itemState}
+                                    : {...square, val: true, type: state.itemState}
                             }
                         }
 
@@ -470,20 +491,20 @@ function Map(props) {
                 break;
 
             case "end":
-                setState((memState) => ({
-                    ...memState,
+                setState((state) => ({
+                    ...state,
                     //state object is immutable so updates have to be done this way
-                    grid: memState.grid.map((square, index) => {
-                        if(index === x + (y * memState.cols)){
+                    grid: state.grid.map((square, index) => {
+                        if(index === x + (y * state.cols)){
                             // console.log(x,y,square.type,state.itemState);
-                            if(square.type === memState.itemState || !square.val){
+                            if(square.type === state.itemState || !square.val){
                                 return square.val
                                     ? {...square, val: false, type: null}
-                                    : {...square, val: true, type: memState.itemState}
+                                    : {...square, val: true, type: state.itemState}
                             }
                         }
 
-                        if(square.type === memState.itemState && square.val && !memState.grid[x + (y * memState.cols)].val){
+                        if(square.type === state.itemState && square.val && !state.grid[x + (y * state.cols)].val){
                             return {...square, val: false, type: null}
                         }
 

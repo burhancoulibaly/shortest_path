@@ -12,7 +12,7 @@
     flex-direction: row;
 }
 #map .square{
-    margin: 2px;
+    margin: 1.85px;;
     border: 1px solid gray;
     border-radius: 5px;
     transition: background 250ms ease;

@@ -100,13 +100,12 @@ function Sandbox(props) {
             }
     
             if(getUserMapLoading){
-                console.log(getUserMapLoading);
                 dispatch({type: "mapNameReset"});
                 dispatch({type: "mapName", payload: { mapName: "..." }});
             }
     
             if(getUserMapData){
-                console.log("data retrieved")
+                // console.log("data retrieved")
                 dispatch({type: "edit"});
                 dispatch({type: "mapNameReset"});
                 dispatch({type: "mapName", payload: { mapName: getUserMapData.getUserMap.name }});
@@ -121,6 +120,7 @@ function Sandbox(props) {
     }, [getUserMapError, getUserMapLoading, getUserMapData, dispatch]);
 
     useEffect(() => {
+        console.log(document.documentElement.clientWidth, document.documentElement.clientHeight)
         const handleWinResize = () => {
             setWinDimensions({
                 width: document.documentElement.clientWidth,
@@ -154,6 +154,9 @@ function Sandbox(props) {
                 return JSON.parse(localStorage.getItem("map")).userMap;
             })
         }else if(localStorage.getItem("map")){
+            console.log(parseInt(localStorage.getItem("mapVersion")));
+            console.log(JSON.parse(localStorage.getItem("map")));
+
             if(parseInt(localStorage.getItem("mapVersion")) !== 0){
                 getUserMap({
                     variables: {
@@ -170,8 +173,6 @@ function Sandbox(props) {
             }
         }
     }
-
-    console.log(menu.menuState.mapName, menu.menuState.mapName[0], menu.menuState.mapName[menuState.mapName.length-1]);
 
     return (
         <div id="sandbox">

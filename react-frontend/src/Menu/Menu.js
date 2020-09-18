@@ -1,8 +1,9 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useCallback } from 'react';
 import './Menu.css';
 import MenuContext from "../MenuContext";
 import UserContext from "../UserContext";
 import Modal from 'react-bootstrap/Modal';
+import InputValidationHelper from '../Helpers/InputValidationHelper';
 
 const onAlgorithmChange = (algorithm, dispatch) => {
     dispatch({type: 'setAlgorithm', payload: { algorithm: algorithm }})
@@ -13,6 +14,26 @@ const onHeuristicChange = (heuristic, dispatch) => {
 }
 
 function SaveMapModal({mapName, handleSave, ...props}){
+    const [inputState, setInputState] = useState({
+        isMapNameValid: true,
+        mapNameErrorMessage: "",
+    })
+
+    const validateNameEdit = (mapName) => {
+        const isValid = InputValidationHelper.validateString(mapName);
+    
+        console.log(isValid)
+        setInputState({
+          ...inputState,
+          isMapNameValid: isValid,
+          mapNameErrorMessage: isValid === false ? "Invalid map name" : ""
+        })
+
+        if(isValid){
+            handleSave(mapName);
+        }
+    }
+
     return (
         <Modal
             {...props}
@@ -29,18 +50,45 @@ function SaveMapModal({mapName, handleSave, ...props}){
                 <form className="savemap">
                     <div className="form-group">
                         <label htmlFor="mapname">Map Name</label>
-                        <input className="form-control" id="mapname" aria-describedby="mapNameHelp" type="text" defaultValue={ mapName[mapName.length-1] } placeholder="Unamed"/>
+                        <input className={(!inputState.isMapNameValid ? "error" : "") + " form-control"} id="mapname" aria-describedby="mapNameHelp" type="text" defaultValue={ mapName[mapName.length-1] } placeholder="Unamed"/>
+                        {!inputState.isMapNameValid &&
+                            <div className="error-text">
+                            <br></br>
+                            {inputState.mapNameErrorMessage}
+                            <br></br>
+                            </div> 
+                        }
                     </div>
                 </form>
             </Modal.Body>
             <Modal.Footer>
-                <button onClick={() => handleSave(document.getElementsByClassName("savemap")[0][0].value)}>Save</button>
+                <button className="btn btn-primary" onClick={() => validateNameEdit(document.getElementsByClassName("savemap")[0][0].value)}>Save</button>
             </Modal.Footer>
         </Modal>
     );
 }
 
 function EditMapModal({mapName, handleNameEdit, ...props}){
+    const [inputState, setInputState] = useState({
+        isMapNameValid: true,
+        mapNameErrorMessage: null,
+    })
+
+    const validateNameEdit = (mapName) => {
+        console.log(mapName)
+        const isValid = InputValidationHelper.validateString(mapName);
+
+        setInputState({
+          ...inputState,
+          isMapNameValid: isValid,
+          mapNameErrorMessage: isValid === false ? "Invalid map name" : ""
+        })
+
+        if(isValid){
+            handleNameEdit(mapName);
+        }
+    }
+
     return (
         <Modal
             {...props}
@@ -57,12 +105,19 @@ function EditMapModal({mapName, handleNameEdit, ...props}){
                 <form className="editmap">
                     <div className="form-group">
                         <label htmlFor="mapname">Map Name</label>
-                        <input className="form-control" id="mapname" aria-describedby="mapNameHelp" type="text" defaultValue={ mapName[mapName.length-1] } placeholder="Unamed"/>
+                        <input className={(!inputState.isMapNameValid ? "error" : "") + " form-control"} id="mapname" aria-describedby="mapNameHelp" type="text" defaultValue={ mapName[mapName.length-1] } placeholder="Unamed"/>
+                        {!inputState.isMapNameValid &&
+                            <div className="error-text">
+                            <br></br>
+                            {inputState.mapNameErrorMessage}
+                            <br></br>
+                            </div> 
+                        }
                     </div>
                 </form>
             </Modal.Body>
             <Modal.Footer>
-                <button onClick={() => handleNameEdit(document.getElementsByClassName("editmap")[0][0].value)}>Save Name</button>
+                <button className="btn btn-primary" onClick={() => validateNameEdit(document.getElementsByClassName("editmap")[0][0].value)}>Save Name</button>
             </Modal.Footer>
         </Modal>
     );
@@ -80,22 +135,20 @@ function  SaveMap({mapName, dispatch, ...props}){
         }
     }
 
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
         setModalShow(false);
-    }
+    }, [setModalShow])
 
     const handleSave = (mapName) => {
         //change isEdit to true, after this is done
         handleClose();
         dispatch({type: "mapName", payload: { mapName: mapName }});
         dispatch({type: "save"});
-        dispatch({type: "edit"});
-        localStorage.setItem("mapVersion", 0);
     }
 
     return (
         <>
-            <button className={(props.user.role === "guest" ? "disabled" : "")} disabled={props.user.role === "guest"} variant="primary" onClick={() => handleShow()}>
+            <button className={(props.user.role === "guest" ? "disabled" : "") + " btn btn-primary"} disabled={props.user.role === "guest"} variant="primary" onClick={() => handleShow()}>
                 Save
             </button>
 
@@ -116,14 +169,14 @@ function  EditMapName({menuState, dispatch, ...props}){
         setModalShow(true);
     }
 
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
         setModalShow(false);
-    }
+    }, [setModalShow])
 
-    const handleNameEdit = (mapName) => {
+    const handleNameEdit = useCallback((mapName) => {
         handleClose();
         dispatch({type: "mapName", payload: { mapName: mapName }});
-    }
+    }, [handleClose, dispatch])
 
     return (
         <>
@@ -145,8 +198,6 @@ function Menu({initialState, ...props}){
     const {user} = useContext(UserContext);
     const {menuState, dispatch} = useContext(MenuContext);
 
-    
-
     return (
         <div className="sb-menu">
             <div className="sb-menu-container">
@@ -160,48 +211,48 @@ function Menu({initialState, ...props}){
                     }  
                 </div>
                 <div className="itemType-btns">
-                    <button className={(menuState.itemState === "start" ? "active" : "")} onClick={() => dispatch({type: 'setItemState', payload: { itemState: "start" }})}>Start Item</button>
-                    <button className={(menuState.itemState === "wall" ? "active" : "")} onClick={() => dispatch({type: 'setItemState', payload: { itemState: "wall" }})}>Wall Item</button>
-                    <button className={(menuState.itemState === "end" ? "active" : "")} onClick={() => dispatch({type: 'setItemState', payload: { itemState: "end" }})}>End Item</button>
+                    <button className={(menuState.itemState === "start" ? "selected" : "") + " btn btn-primary"} onClick={() => dispatch({type: 'setItemState', payload: { itemState: "start" }})}>Start Item</button>
+                    <button className={(menuState.itemState === "wall" ? "selected" : "") + " btn btn-primary"} onClick={() => dispatch({type: 'setItemState', payload: { itemState: "wall" }})}>Wall Item</button>
+                    <button className={(menuState.itemState === "end" ? "selected" : "") + " btn btn-primary"} onClick={() => dispatch({type: 'setItemState', payload: { itemState: "end" }})}>End Item</button>
                 </div>
-                <div className="algorithm-settings">
-                    <select name="algorithm" id="algorithm" value={menuState.algorithm} onChange={(e) => onAlgorithmChange(e.currentTarget.value, dispatch)}>
+                <div className="algorithm-settings form-group">
+                    <select className="form-control" name="algorithm" id="algorithm" value={menuState.algorithm} onChange={(e) => onAlgorithmChange(e.currentTarget.value, dispatch)}>
                         <option value="astar">A*</option>
                         <option value="dijkstra">Dijkstra</option>
                         <option value="bfs">Breadth First Search</option>
                         <option value="dfs">Depth First Search</option>
                         <option value="greedybfs">Greedy Best First Search</option>
                     </select>
-                    <select disabled={menuState.algorithm !== "astar" && menuState.algorithm !== "greedybfs"} name="hueristic" id="heuristic" value={menuState.heuristic} onChange={(e) => onHeuristicChange(e.currentTarget.value, dispatch)}>
+                    <select className="form-control" disabled={menuState.algorithm !== "astar" && menuState.algorithm !== "greedybfs"} name="hueristic" id="heuristic" value={menuState.heuristic} onChange={(e) => onHeuristicChange(e.currentTarget.value, dispatch)}>
                         <option value="manhattan">Manhattan Distance</option>
                         <option value="euclidean">Euclidean Distance</option>
                     </select>
                 </div>
                 <div className="path-settings">
-                    <div>
-                        <label htmlFor="cutCorners">Cut Corners</label>
-                        <input checked={menuState.cutCorners} id="cutCorners" type="checkbox" onChange={() => dispatch({type: 'cutCorners'})}></input>
+                    <div className="form-check">
+                        <input className="form-check-input" checked={menuState.cutCorners} id="cutCorners" type="checkbox" onChange={() => dispatch({type: 'cutCorners'})}></input>
+                        <label className="form-check-label" htmlFor="cutCorners">Cut Corners</label>
                     </div>
-                    <div>
-                        <label htmlFor="allowDiags">Diagonals</label>
-                        <input checked={menuState.allowDiags} id="allowDiags" type="checkbox" onChange={() => dispatch({type: 'allowDiags'})}></input>      
+                    <div className="form-check">
+                    <input className="form-check-input" checked={menuState.allowDiags} id="allowDiags" type="checkbox" onChange={() => dispatch({type: 'allowDiags'})}></input>      
+                        <label className="form-check-label" htmlFor="allowDiags">Diagonals</label>
                     </div>
-                    <div>
-                        <label htmlFor="biDirectional">Bi-Directional</label>
-                        <input disabled={menuState.algorithm === "dfs"} checked={menuState.biDirectional} id="biDirectional" type="checkbox" onChange={() => dispatch({type: 'biDirectional'})}></input>
+                    <div className="form-check">
+                        <input className="form-check-input" disabled={menuState.algorithm === "dfs"} checked={menuState.biDirectional} id="biDirectional" type="checkbox" onChange={() => dispatch({type: 'biDirectional'})}></input>
+                        <label className="form-check-label" htmlFor="biDirectional">Bi-Directional</label>
                     </div>
                 </div>
                 <div className="map-settings">
-                    <button onClick={() => dispatch({type: 'pathClear'})}>Clear Path</button>
-                    <button onClick={() => dispatch({type: 'clear'})}>Clear</button>
+                    <button className="btn btn-primary" onClick={() => dispatch({type: 'pathClear'})}>Clear Path</button>
+                    <button className="btn btn-primary" onClick={() => dispatch({type: 'clear'})}>Clear</button>
                     <SaveMap 
                         user={user}
                         mapName={menuState.mapName}
                         dispatch={dispatch}
                     />
-                    <button onClick={() => dispatch({type: 'reset', payload: {init: initialState}})}>Reset</button>
+                    <button className="btn btn-primary" onClick={() => dispatch({type: 'reset', payload: {init: initialState}})}>Reset</button>
                 </div>
-                <button onClick={() => dispatch({type: 'run'})}>Run</button>
+                <button className="btn btn-primary" onClick={() => dispatch({type: 'run'})}>Run</button>
             </div>
         </div>
     )

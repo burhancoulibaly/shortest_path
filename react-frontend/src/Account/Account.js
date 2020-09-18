@@ -3,11 +3,33 @@ import './Account.css';
 import UserContext from "../UserContext";
 import { useQuery } from '@apollo/client';
 import MapHelper from '../Helpers/MapHelper';
+import InputValidationHelper from '../Helpers/InputValidationHelper';
 import { Link } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import { useMutation } from '@apollo/client';
 
 function EditMapModal({mapName, handleNameEdit, ...props}){
+  const [inputState, setInputState] = useState({
+    isMapNameValid: true,
+    mapNameErrorMessage: "",
+  })
+
+  const validateNameEdit = (mapName) => {
+    console.log(mapName)
+    const isValid = InputValidationHelper.validateString(mapName);
+
+    console.log(isValid)
+    setInputState({
+      ...inputState,
+      isMapNameValid: isValid,
+      mapNameErrorMessage: isValid === false ? "Invalid map name" : ""
+    })
+
+    if(isValid){
+      handleNameEdit(mapName);
+    }
+  }
+
   return (
       <Modal
           {...props}
@@ -24,12 +46,19 @@ function EditMapModal({mapName, handleNameEdit, ...props}){
               <form className="editmap">
                   <div className="form-group">
                       <label htmlFor="mapname">Map Name</label>
-                      <input className="form-control" id="mapname" aria-describedby="mapNameHelp" type="text" defaultValue={ mapName } placeholder="Unamed"/>
+                      <input className={(!inputState.isMapNameValid ? "error" : "") + " form-control"} id="mapname" aria-describedby="mapNameHelp" type="text" defaultValue={ mapName } placeholder="Unamed"/>
+                      {!inputState.isMapNameValid &&
+                        <div className="error-text">
+                          <br></br>
+                          {inputState.mapNameErrorMessage}
+                          <br></br>
+                        </div> 
+                      }
                   </div>
               </form>
           </Modal.Body>
           <Modal.Footer>
-              <button onClick={() => handleNameEdit(document.getElementsByClassName("editmap")[0][0].value)}>Save Name</button>
+              <button className="btn btn-primary" onClick={() => validateNameEdit(document.getElementsByClassName("editmap")[0][0].value)}>Save Name</button>
           </Modal.Footer>
       </Modal>
   );
@@ -94,12 +123,13 @@ function  EditMapName({map, user, refetch, ...props}){
 
 function Account() {
   const {user} = useContext(UserContext);
-  const { error: mapsError, data: mapsData, refetch: mapsRefetch} = useQuery(MapHelper.getUsersMaps, {
+  const { error: mapsError, data: mapsData, refetch} = useQuery(MapHelper.getUsersMaps, {
     variables: {
       username: user.username
-    }
+    },
+    notifyOnNetworkStatusChange: true,
   }); //{ fetchPolicy: "network-only" }
-  const [deleteMap, { error: deleteMapError, loading: deleteMapLoading, data: deleteMapData }] = useMutation(MapHelper.deleteMap);
+  const [deleteMap, { error: deleteMapError, data: deleteMapData }] = useMutation(MapHelper.deleteMap);
 
   const [maps, setMaps] = useState(); 
 
@@ -125,23 +155,25 @@ function Account() {
     if(deleteMapData){
       console.log(deleteMapData);
 
-      mapsRefetch();
+
+      refetch();
     }
-  }, [user, deleteMapError, deleteMapData, mapsRefetch]);
+  }, [deleteMapError, deleteMapData, refetch]);
 
   return (
     <div id="account">
       {user &&
         <h1 className="username">{user.username}</h1>
       }
+      <h1 class="maps-header">Maps</h1>
       <div className="links-container">
       {maps && 
         maps.map((map, index) => {
           return (
               <div className="link-container" key={index}>
-                <div className="map-preview">
+                {/* <div className="map-preview">
                   Map Preview
-                </div>
+                </div> */}
                 <div className="map-info">
                   <Link to={{pathname: "/sandbox", state: { userMap: map.map, mapName: map.name }}}>
                     <div>
@@ -177,7 +209,7 @@ function Account() {
                       <EditMapName 
                         user={user}
                         map={map}
-                        refetch={mapsRefetch}
+                        refetch={refetch}
                       />
                     }
                     <Link to={{pathname: "/sandbox", state: { userMap: map.map, mapName: map.name }}}>

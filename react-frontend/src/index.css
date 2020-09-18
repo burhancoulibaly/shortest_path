@@ -30,3 +30,13 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+form .error{
+  background-color: pink !important;
+  border-color: red !important;
+  box-shadow: 0 0 0 .2rem red !important;
+}
+
+form .error-text{
+  color: red;  
+}
