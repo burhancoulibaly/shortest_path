@@ -63,7 +63,7 @@ const resolvers = {
 
             try {
                 const maps = await db.getUsersMaps(username);
-
+                
                 return maps;
             } catch (error) {
                 console.log(error);

@@ -70,7 +70,7 @@ function register(username, email, password){
             let loginRef = db.collection('login').doc(username);
 
             let response = (await userRef.get()).data();
-
+            
             if(response){
                 throw new Error("Account already exist");
             }
@@ -222,7 +222,8 @@ function saveMap(username, mapName, map){
         const userMapsRef = db.collection('user_maps').doc(mapName);
 
         try { 
-            if(await db.collection('user').doc(username).collection("maps").doc(mapName).get){
+            if((await db.collection('user').doc(username).collection("maps").doc(mapName).get()).data()){
+                console.log((await db.collection('user').doc(username).collection("maps").doc(mapName).get()).data())
                 throw new Error("A map with this name already exist");
             }
 
@@ -251,7 +252,11 @@ function editMap(username, mapNameOrig, mapNameEdit, map){
         const origUserRef = db.collection('user').doc(username).collection("maps").doc(mapNameOrig);
         const origUserMapsRef = db.collection('user_maps').doc(mapNameOrig);
 
+        let origUserMapsRefData;
+
         try {
+            origUserMapsRefData = await origUserMapsRef.get();
+
             await origUserRef.delete();
             await origUserMapsRef.delete();
         }catch (error) {
@@ -266,9 +271,9 @@ function editMap(username, mapNameOrig, mapNameEdit, map){
                 name: mapNameEdit,
                 map: map,
                 owner: username,
-                highest_score: null,
-                second_highest_score: null,
-                third_highest_score: null,
+                highest_score: origUserMapsRefData.data().highest_score,
+                second_highest_score: origUserMapsRefData.data().second_highest_score,
+                third_highest_score: origUserMapsRefData.data().third_highest_score,
             }); 
 
             await editUserRef.set({

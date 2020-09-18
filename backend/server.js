@@ -75,6 +75,7 @@ app.get('/refreshToken', async(req, res) => {
 
 app.get('/deleteRefreshToken', async(req, res) => {
     try {
+        console.log(req.cookies.jid)
         let response = await deleteToken(req.cookies.jid, res);
 
         res.status(200).send(response);
