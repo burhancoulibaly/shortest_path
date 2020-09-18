@@ -39,7 +39,7 @@ const updateUser = (userData, setUser) => {
 
 //Log user out
 const logout = (setUser) => {
-    axios.get("http://localhost:3000/deleteRefreshToken")
+    axios.get("https://shortestpathbackend.herokuapp.com/deleteRefreshToken")
         .then((response) => {
             updateUser(response.data, setUser);
 
@@ -145,7 +145,7 @@ function Routes() {
     //To make sure tokenRefresh attempt is only made once.
     useEffect(() => {
         updateUser("loading", setUser)
-        axios.get("http://localhost:3000/refreshToken")
+        axios.get("https://shortestpathbackend.herokuapp.com/refreshToken")
             .then((response) => {
                 // console.log(response.data);
                 updateUser(response.data, setUser);
