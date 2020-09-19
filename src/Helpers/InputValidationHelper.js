@@ -24,7 +24,6 @@ const InputValidationHelper = {
         return true;
     },
     validatePasswords: (str1, str2) => {
-        console.log(str1, str2);
         if(str1 !== str2){
             return false;
         }
