@@ -14,6 +14,8 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-d
 import UserContext from './UserContext';
 import RouteGuard from './RouteGuard';
 
+const url = !process.env.NODE_ENV || process.env.NODE_ENV === 'development' ? "http://localhost:3000/" : "https://shortestpathbackend.herokuapp.com";
+
 //Update user
 const updateUser = (userData, setUser) => {
     if(userData === "loading"){
@@ -39,7 +41,7 @@ const updateUser = (userData, setUser) => {
 
 //Log user out
 const logout = (setUser) => {
-    axios.get("https://shortestpathbackend.herokuapp.com/deleteRefreshToken")
+    axios.get(url + "deleteRefreshToken")
         .then((response) => {
             updateUser(response.data, setUser);
 
@@ -145,7 +147,7 @@ function Routes() {
     //To make sure tokenRefresh attempt is only made once.
     useEffect(() => {
         updateUser("loading", setUser)
-        axios.get("https://shortestpathbackend.herokuapp.com/refreshToken")
+        axios.get(url + "refreshToken")
             .then((response) => {
                 // console.log(response.data);
                 updateUser(response.data, setUser);
