@@ -1,7 +1,7 @@
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 
-const url = !process.env.NODE_ENV || process.env.NODE_ENV === 'development' ? "http://localhost:3000/" : "https://shortestpathbackend.herokuapp.com";
+const url = !process.env.NODE_ENV || process.env.NODE_ENV === 'development' ? "http://localhost:3000/" : "https://shortestpathbackend.herokuapp.com/";
 
 const httpLink = createHttpLink({ 
   uri:  url + 'graphql',
