@@ -48,7 +48,7 @@ function getNeighbors(current, rows, cols, node, cutCorners, allowDiags){
     // bottom right point.x+1, point.y+1    (point.x+1) + (point.y+1 * cols)
 
     const neighbors = new Array(8);
-    
+
     if(current.getPoint().x > 0){
         const left = getIndex((current.getPoint().x-1), (current.getPoint().y), cols);
 
@@ -213,176 +213,194 @@ function DijkstraBiDirectional(rows, cols, gridMap, memState, setState, cutCorne
         heapFromRight.extractMin();
         // console.log(Array.from(heap.getRootList()))
 
-        const newState = {
-            ...memState,
-            grid: memState.grid.map((square, index) => {
-                if(current1.getPoint().x === square.x && current1.getPoint().y === square.y){
-                    if(current1.getPoint().type !== "start" && current1.getPoint().type !== "end"){
-                        memState.grid[index] = {
-                            ...memState.grid[index],
-                            val: true,
-                            type: "neighbors"
-                        }
-                    }
-                    return {...square}
-                }
-                if(current2.getPoint().x === square.x && current2.getPoint().y === square.y){
-                    if(current2.getPoint().type !== "start" && current2.getPoint().type !== "end"){
-                        memState.grid[index] = {
-                            ...memState.grid[index],
-                            val: true,
-                            type: "neighbors"
-                        }
-                    }
-                    return {...square}
-                }
-                return {...square}
-            })
-        }
-        states.push(newState);
-
-        if(cameFromLeft[getIndex(current2.getPoint().x, current2.getPoint().y, cols)] || cameFromRight[getIndex(current1.getPoint().x, current1.getPoint().y, cols)]){
-            let cameFromLeftPoint;
-            let cameFromRightPoint;
-
-            if(cameFromLeft[getIndex(current2.getPoint().x, current2.getPoint().y, cols)]){
-                cameFromRightPoint = current2.getPoint();
-                cameFromLeftPoint = current2.getPoint();
-            }else if(cameFromRight[getIndex(current1.getPoint().x, current1.getPoint().y, cols)]){
-                cameFromRightPoint = current1.getPoint();
-                cameFromLeftPoint = current1.getPoint();
-            }
-            
-
-            const state = states[states.length-1];
-            setState({
-                // return {
-                ...state,
-                //state object is immutable so updates have to be done this way
-                grid: state.grid.map((square, index) => {
-                    if(cameFromLeft[index] || cameFromRight[index]){
-                        if(square.x === cameFromLeftPoint.x && square.y === cameFromLeftPoint.y){
-                            let prev = cameFromLeftPoint;
-                
-                            while(prev){                   
-                                if(prev.type !== "start"){
-                                    state.grid[getIndex(prev.x,prev.y,state.cols)] = {
-                                        ...state.grid[getIndex(prev.x,prev.y,state.cols)],
-                                        val: true,
-                                        type: "path"
-                                    }
+        if(current1.getPoint().type !== "wall" || current2.getPoint().type !== "wall"){
+            if(cameFromLeft[getIndex(current1.getPoint().x, current1.getPoint().y, cols)] || cameFromRight[getIndex(current2.getPoint().x, current2.getPoint().y, cols)] || (current1.getPoint().x === startPoint.x && current1.getPoint().y === startPoint.y) || (current2.getPoint().x === endPoints[0].x && current2.getPoint().y === endPoints[0].y)){
+                const newState = {
+                    ...memState,
+                    grid: memState.grid.map((square, index) => {
+                        if(current1.getPoint().x === square.x && current1.getPoint().y === square.y){
+                            if(current1.getPoint().type !== "start" && current1.getPoint().type !== "end"){
+                                memState.grid[index] = {
+                                    ...memState.grid[index],
+                                    val: true,
+                                    type: "neighbors"
                                 }
-                                prev = cameFromLeft[getIndex(prev.x,prev.y,state.cols)];
                             }
+                            return {...square}
                         }
-                        if(square.x === cameFromRightPoint.x && square.y === cameFromRightPoint.y){
-                            let prev = cameFromRightPoint;
-                
-                            while(prev){                   
-                                if(prev.type !== "end"){
-                                    state.grid[getIndex(prev.x,prev.y,state.cols)] = {
-                                        ...state.grid[getIndex(prev.x,prev.y,state.cols)],
-                                        val: true,
-                                        type: "path"
-                                    }
+                        if(current2.getPoint().x === square.x && current2.getPoint().y === square.y){
+                            if(current2.getPoint().type !== "start" && current2.getPoint().type !== "end"){
+                                memState.grid[index] = {
+                                    ...memState.grid[index],
+                                    val: true,
+                                    type: "neighbors"
                                 }
-                                prev = cameFromRight[getIndex(prev.x,prev.y,state.cols)];
+                            }
+                            return {...square}
+                        }
+                        return {...square}
+                    })
+                }
+                states.push(newState);   
+            }
+        }
+
+        if(current1.getPoint().type !== "wall" && current2.getPoint().type !== "wall"){
+            if(cameFromLeft[getIndex(current2.getPoint().x, current2.getPoint().y, cols)] || cameFromRight[getIndex(current1.getPoint().x, current1.getPoint().y, cols)]){
+                let cameFromLeftPoint;
+                let cameFromRightPoint;
+    
+                if(cameFromLeft[getIndex(current2.getPoint().x, current2.getPoint().y, cols)]){
+                    cameFromRightPoint = current2.getPoint();
+                    cameFromLeftPoint = current2.getPoint();
+                }else if(cameFromRight[getIndex(current1.getPoint().x, current1.getPoint().y, cols)]){
+                    cameFromRightPoint = current1.getPoint();
+                    cameFromLeftPoint = current1.getPoint();
+                }
+                
+                if(!cameFromLeft[getIndex(cameFromLeftPoint.x, cameFromLeftPoint.y, cols)] || !cameFromRight[getIndex(cameFromRightPoint.x, cameFromRightPoint.y, cols)]){
+                    console.log("NO PATH FOUND");
+
+                    return states
+                }
+
+
+                
+    
+                const state = states[states.length-1];
+                setState({
+                    // return {
+                    ...state,
+                    //state object is immutable so updates have to be done this way
+                    grid: state.grid.map((square, index) => {
+                        if(cameFromLeft[index] || cameFromRight[index]){
+                            if(square.x === cameFromLeftPoint.x && square.y === cameFromLeftPoint.y){
+                                let prev = cameFromLeftPoint;
+                    
+                                while(prev){                   
+                                    if(prev.type !== "start"){
+                                        state.grid[getIndex(prev.x,prev.y,state.cols)] = {
+                                            ...state.grid[getIndex(prev.x,prev.y,state.cols)],
+                                            val: true,
+                                            type: "path"
+                                        }
+                                    }
+                                    prev = cameFromLeft[getIndex(prev.x,prev.y,state.cols)];
+                                }
+                            }
+                            if(square.x === cameFromRightPoint.x && square.y === cameFromRightPoint.y){
+                                let prev = cameFromRightPoint;
+                    
+                                while(prev){                   
+                                    if(prev.type !== "end"){
+                                        state.grid[getIndex(prev.x,prev.y,state.cols)] = {
+                                            ...state.grid[getIndex(prev.x,prev.y,state.cols)],
+                                            val: true,
+                                            type: "path"
+                                        }
+                                    }
+                                    prev = cameFromRight[getIndex(prev.x,prev.y,state.cols)];
+                                }
+                                return {...square};
                             }
                             return {...square};
                         }
                         return {...square};
-                    }
-                    return {...square};
-                })
-                
-            });
-
-            console.log("PATH FOUND!!!!!");
-            return states;
+                    })
+                    
+                });
+    
+                console.log("PATH FOUND!!!!!");
+                return states;
+            }
         }
 
-        const neighbors1 = getNeighbors(current1, rows, cols, nodeFromLeft, cutCorners, allowDiags);
-        const neighbors2 = getNeighbors(current2, rows, cols, nodeFromRight, cutCorners, allowDiags);
+        if(current1.getPoint().type !== "wall"){
+            const neighbors1 = getNeighbors(current1, rows, cols, nodeFromLeft, cutCorners, allowDiags);
 
-        console.log(neighbors2);
+            // console.log(neighbors)
+            neighbors1.map((neighbor) => {
+                // console.log(neighbor);
 
-        // console.log(neighbors)
-        neighbors1.map((neighbor) => {
-            // console.log(neighbor);
+                const current1Dist = nodeFromLeft[getIndex(current1.getPoint().x, current1.getPoint().y, cols)].dist + dist(current1, neighbor);
 
-            const current1Dist = nodeFromLeft[getIndex(current1.getPoint().x, current1.getPoint().y, cols)].dist + dist(current1, neighbor);
+                if(current1Dist < nodeFromLeft[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist){
 
-            if(current1Dist < nodeFromLeft[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist){
+                    nodeFromLeft[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist = current1Dist;
+                    
+                    cameFromLeft[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)] = current1.getPoint();
 
-                nodeFromLeft[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist = current1Dist;
-                
-                cameFromLeft[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)] = current1.getPoint();
+                    heapFromLeft.decreaseKey(neighbor, nodeFromLeft[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist);
 
-                heapFromLeft.decreaseKey(neighbor, nodeFromLeft[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist);
-
-                const newState = {
-                    ...memState,
-                    grid: memState.grid.map((square, index) => {
-                        if(neighbor.getPoint().x === square.x && neighbor.getPoint().y === square.y){
-                            if(neighbor.getPoint().type !== "start" && neighbor.getPoint().type !== "end"){
-                                memState.grid[index] = {
-                                    ...memState.grid[index],
-                                    val: true,
-                                    type: "openset"
+                    const newState = {
+                        ...memState,
+                        grid: memState.grid.map((square, index) => {
+                            if(neighbor.getPoint().x === square.x && neighbor.getPoint().y === square.y){
+                                if(neighbor.getPoint().type !== "start" && neighbor.getPoint().type !== "end"){
+                                    memState.grid[index] = {
+                                        ...memState.grid[index],
+                                        val: true,
+                                        type: "openset"
+                                    }
                                 }
+                                return {...square}
                             }
                             return {...square}
-                        }
-                        return {...square}
-                    })
-                }
-                states.push(newState); 
+                        })
+                    }
+                    states.push(newState); 
+
+                    return null;
+                } 
 
                 return null;
-            } 
+            })
+        }
 
-            return null;
-        })
+        
+        if(current2.getPoint().type !== "wall"){
+            const neighbors2 = getNeighbors(current2, rows, cols, nodeFromRight, cutCorners, allowDiags);
 
-        neighbors2.map((neighbor) => {
-            // console.log(neighbor);
-
-            const current2Dist = nodeFromRight[getIndex(current2.getPoint().x, current2.getPoint().y, cols)].dist + dist(current2, neighbor);
-
-            if(current2Dist < nodeFromRight[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist){
-
-                nodeFromRight[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist = current2Dist;
-                
-                cameFromRight[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)] = current2.getPoint();
-
-                console.log(neighbor);
-                console.log(nodeFromRight[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist);
-
-                heapFromRight.decreaseKey(neighbor, nodeFromRight[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist);
-
-                const newState = {
-                    ...memState,
-                    grid: memState.grid.map((square, index) => {
-                        if(neighbor.getPoint().x === square.x && neighbor.getPoint().y === square.y){
-                            if(neighbor.getPoint().type !== "start" && neighbor.getPoint().type !== "end"){
-                                memState.grid[index] = {
-                                    ...memState.grid[index],
-                                    val: true,
-                                    type: "openset"
+            neighbors2.map((neighbor) => {
+                // console.log(neighbor);
+    
+                const current2Dist = nodeFromRight[getIndex(current2.getPoint().x, current2.getPoint().y, cols)].dist + dist(current2, neighbor);
+    
+                if(current2Dist < nodeFromRight[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist){
+    
+                    nodeFromRight[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist = current2Dist;
+                    
+                    cameFromRight[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)] = current2.getPoint();
+    
+                    // console.log(neighbor);
+                    // console.log(nodeFromRight[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist);
+    
+                    heapFromRight.decreaseKey(neighbor, nodeFromRight[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist);
+    
+                    const newState = {
+                        ...memState,
+                        grid: memState.grid.map((square, index) => {
+                            if(neighbor.getPoint().x === square.x && neighbor.getPoint().y === square.y){
+                                if(neighbor.getPoint().type !== "start" && neighbor.getPoint().type !== "end"){
+                                    memState.grid[index] = {
+                                        ...memState.grid[index],
+                                        val: true,
+                                        type: "openset"
+                                    }
                                 }
+                                return {...square}
                             }
                             return {...square}
-                        }
-                        return {...square}
-                    })
-                }
-                states.push(newState); 
-
+                        })
+                    }
+                    states.push(newState); 
+    
+                    return null;
+                } 
+    
                 return null;
-            } 
-
-            return null;
-        })
+            })
+        }
     }
     
     return states;

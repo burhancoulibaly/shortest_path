@@ -105,4 +105,52 @@
     height: 100%;
 }
 
+@media screen and (max-width: 1385px) , screen and (max-height: 1385px) {
+    #account .links-container{
+        padding: 5rem 5rem;
+    }
+
+    #account .links-container .link-container .map-info{
+        width: 50%;
+        padding: 1rem;
+    }
+
+    #account .links-container .link-container .map-edit{
+        width: 25%;
+    }
+
+    #account .links-container .link-container .top-users{
+        width: 25%;
+    }
+}
+
+@media screen and (max-width: 730px) , screen and (max-height: 730px) {
+    #account .links-container{
+        padding: 5rem 1rem;
+    }
+
+    #account .links-container .link-container .map-info{
+        width: 33.3%;
+        padding: 1rem;
+    }
+
+    #account .links-container .link-container .map-info h3{
+        font-size: 1.5rem;
+    }
+
+    #account .links-container .link-container .map-edit{
+        width: 33.3%;
+    }
+
+    #account .links-container .link-container .top-users{
+        width: 33.3%;
+    }
+}
+
+@media screen and (max-width: 481px) , screen and (max-height: 481px) {
+    #account .links-container .link-container .map-info h3{
+        font-size: 1rem;
+    }
+}
+
 

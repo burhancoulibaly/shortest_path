@@ -138,15 +138,20 @@ const LoginForm = (props) => {
         {!inputSignUpState.isPasswordValid && <div className="error-text">{inputSignUpState.passwordErrorMessage}</div>}
         {!inputSignUpState.passwordMatch && <div className="error-text">{inputSignUpState.passwordMatchErrorMessage}</div>}
 
-        <div className="form-group">
-          <label htmlFor="signupUsername">Username</label>
-          <input type="username" className={(!inputSignUpState.isUsernameValid ? "error" : "") + " form-control"} id="signupUsername" aria-describedby="usernameHelp" placeholder="Enter Username"></input>
+        <div className="user-ids">
+          <div className="form-group">
+            <label htmlFor="signupUsername">Username</label>
+            <input type="username" className={(!inputSignUpState.isUsernameValid ? "error" : "") + " form-control"} id="signupUsername" aria-describedby="usernameHelp" placeholder="Enter Username"></input>
+          </div>
+          <div className="form-group">
+            <label htmlFor="signupEmail">Email address</label>
+            <input className={(!inputSignUpState.isEmailValid ? "error" : "") + " form-control"} id="signupEmail" aria-describedby="emailHelp" placeholder="Enter Email"></input>
+            { document.documentElement.clientWidth > 768 && document.documentElement.clientHeight > 768 &&
+              <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small>
+            }
+          </div>
         </div>
-        <div className="form-group">
-          <label htmlFor="signupEmail">Email address</label>
-          <input className={(!inputSignUpState.isEmailValid ? "error" : "") + " form-control"} id="signupEmail" aria-describedby="emailHelp" placeholder="Enter Email"></input>
-          <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small>
-        </div>
+        
         <div className="password">
           <div className="form-group">
             <label htmlFor="signupPassword1">Password</label>

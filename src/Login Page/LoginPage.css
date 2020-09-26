@@ -7,9 +7,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    min-height: 768px;
+    background-color: gray;
 }
 #login-page .login-form {
-    position: fixed;
     width: 600px;
     height: 600px;
     background-color: white;
@@ -63,4 +64,46 @@
 }
 #login-page .error {
     color: red;
+}
+
+@media screen and (max-width: 768px) , screen and (max-height: 768px) {
+    #login-page .login-form {
+        width: 450px;
+        height: 550px;
+    }
+
+    #login-page .user-ids {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    #login-page .login-container .login-options h1{
+        font-size: 1.5rem;
+    }
+
+    #login-page .login-form label{
+        font-size: 1rem
+    }
+
+    #login-page .signup .user-ids .form-group:first-child{
+        margin-right: .5rem;
+
+    }
+}
+
+@media screen and (max-width: 481px) , screen and (max-height: 481px) {
+    #login-page .login-form {
+        width: 300px;
+        height: 400px;
+    }
+
+    #login-page .login-container .login-options h1{
+        font-size: 1.0rem;
+    }
+
+    #login-page .login-form label{
+        font-size: .70rem
+    }
 }

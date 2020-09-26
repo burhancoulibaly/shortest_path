@@ -122,8 +122,8 @@ function Sandbox(props) {
     useEffect(() => {
         const handleWinResize = () => {
             setWinDimensions({
-                width: document.documentElement.clientWidth,
-                height: document.documentElement.clientHeight
+                width: document.getElementById("map").offsetWidth,
+                height: document.getElementById("map").offsetHeight
             })
         }
 

@@ -1,5 +1,6 @@
 #home{
     height: 100%;
+    min-height: 481px;
     background-color: gray;
 }
 #home .menu-container{
@@ -9,7 +10,7 @@
     align-items: center;
 }
 #home .menu-container .menu{
-    position: fixed;
+    /* position: fixed; */
     width: 600px;
     height: 500px;
     background-color: white;
@@ -31,3 +32,22 @@
 }
 
 /* //Resize menu container for when the window size gets smaller so that it doesn't overlap the top nav */
+
+@media screen and (max-width: 768px) , screen and (max-height: 768px) {
+    #home .menu-container .menu{
+        width: 450px;
+        height: 450px;
+        padding: 3rem;
+    }
+    #home .menu-container .menu-buttons button{
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+}
+
+@media screen and (max-width: 481px) , screen and (max-height: 481px) {
+    #home .menu-container .menu{
+        width: 300px;
+        height: 400px;
+    }
+}

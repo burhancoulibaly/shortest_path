@@ -47,8 +47,99 @@ function getNeighbors(current, rows, cols, node, cutCorners, allowDiags){
     // bottom left point.x-1, point.y+1     (point.x-1) + (point.y+1 * cols)
     // bottom right point.x+1, point.y+1    (point.x+1) + (point.y+1 * cols)
 
-    const neighbors = new Array(8);
+    // const neighbors = new Array(8);
     
+    // if(current.getPoint().x > 0){
+    //     const left = getIndex((current.getPoint().x-1), (current.getPoint().y), cols);
+
+    //     if(node[left].node.getPoint().type !== "wall"){
+    //         neighbors[0] = node[left].node;   
+    //     }
+    // }
+    // if(current.getPoint().x < cols-1){
+    //     const right = getIndex((current.getPoint().x+1), (current.getPoint().y), cols);
+
+    //     if(node[right].node.getPoint().type !== "wall"){
+    //         neighbors[1] = node[right].node;   
+    //     }
+    // }
+    // if(current.getPoint().y > 0){
+    //     const up = getIndex((current.getPoint().x), (current.getPoint().y-1), cols);
+
+    //     if(node[up].node.getPoint().type !== "wall"){
+    //         neighbors[2] = node[up].node;   
+    //     }
+    // }
+    // if(current.getPoint().y < rows-1){
+    //     const down = getIndex((current.getPoint().x), (current.getPoint().y+1), cols);
+
+    //     if(node[down].node.getPoint().type !== "wall"){
+    //         neighbors[3] = node[down].node;   
+    //     }
+    // }
+    // if(current.getPoint().x > 0 && current.getPoint().y > 0){
+    //     const topLeft = getIndex((current.getPoint().x-1), (current.getPoint().y-1), cols);
+
+    //     if(node[topLeft].node.getPoint().type !== "wall" && node[topLeft].node.getPoint().type !== "start"){
+    //         if(allowDiags){
+    //             if(!cutCorners){
+    //                 if(node[topLeft+1].node.getPoint().type !== "wall" && node[topLeft+50].node.getPoint().type !== "wall"){
+    //                     neighbors[4] = node[topLeft].node;
+    //                 }
+    //             }else{
+    //                 neighbors[4] = node[topLeft].node;
+    //             }
+    //         }
+    //     }
+    // }
+    // if(current.getPoint().x < cols-1 && current.getPoint().y > 0){
+    //     const topRight = getIndex((current.getPoint().x+1), (current.getPoint().y-1), cols);
+
+    //     if(node[topRight].node.getPoint().type !== "wall" && node[topRight].node.getPoint().type !== "start"){
+    //         if(allowDiags){
+    //             if(!cutCorners){
+    //                 if(node[topRight-1].node.getPoint().type !== "wall" && node[topRight+50].node.getPoint().type !== "wall"){
+    //                     neighbors[5] = node[topRight].node; 
+    //                 }
+    //             }else{
+    //                 neighbors[5] = node[topRight].node; 
+    //             }
+    //         }
+    //     }
+    // }
+    // if(current.getPoint().x > 0 && current.getPoint().y < rows-1){
+    //     const bottomLeft  = getIndex((current.getPoint().x-1), (current.getPoint().y+1), cols);
+
+    //     if(node[bottomLeft].node.getPoint().type !== "wall" && node[bottomLeft].node.getPoint().type !== "start"){
+    //         if(allowDiags){
+    //             if(!cutCorners){
+    //                 if(node[bottomLeft+1].node.getPoint().type !== "wall" && node[bottomLeft-50].node.getPoint().type !== "wall"){
+    //                     neighbors[6] = node[bottomLeft].node;
+    //                 }
+    //             }else{
+    //                 neighbors[6] = node[bottomLeft].node;
+    //             }
+    //         }
+    //     }
+    // }
+    // if(current.getPoint().x < cols-1 && current.getPoint().y < rows-1){
+    //     const bottomRight = getIndex((current.getPoint().x+1), (current.getPoint().y+1), cols);
+
+    //     if(node[bottomRight].node.getPoint().type !== "wall" && node[bottomRight].node.getPoint().type !== "start"){
+    //         if(allowDiags){
+    //             if(!cutCorners){
+    //                 if(node[bottomRight-1].node.getPoint().type !== "wall" && node[bottomRight-50].node.getPoint().type !== "wall"){
+    //                     neighbors[7] = node[bottomRight].node; 
+    //                 }
+    //             }else{
+    //                 neighbors[7] = node[bottomRight].node; 
+    //             }
+    //         }
+    //     }
+    // }
+
+    const neighbors = new Array(8);
+
     if(current.getPoint().x > 0){
         const left = getIndex((current.getPoint().x-1), (current.getPoint().y), cols);
 
@@ -193,83 +284,17 @@ function Dijkstra(rows, cols, gridMap, memState, setState, cutCorners, allowDiag
         heap.extractMin();
         // console.log(Array.from(heap.getRootList()))
 
-        const newState = {
-            ...memState,
-            grid: memState.grid.map((square, index) => {
-                if(current.getPoint().x === square.x && current.getPoint().y === square.y){
-                    if(current.getPoint().type !== "start" && current.getPoint().type !== "end"){
-                        memState.grid[index] = {
-                            ...memState.grid[index],
-                            val: true,
-                            type: "neighbors"
-                        }
-                    }
-                    return {...square}
-                }
-                return {...square}
-            })
-        }
-        states.push(newState);
-
-        if(current.getPoint().x === goal.x && current.getPoint().y === goal.y){
-            const state = states[states.length-1];
-            setState({
-                // return {
-                ...state,
-                //state object is immutable so updates have to be done this way
-                grid: state.grid.map((square, index) => {
-                    if(cameFrom[index]){
-                        if(square.type === "end"){
-                            let prev = cameFrom[index];
-                
-                            while(prev){                   
-                                if(prev.type !== "start" && prev.type !== "end"){
-                                    state.grid[getIndex(prev.x,prev.y,state.cols)] = {
-                                        ...state.grid[getIndex(prev.x,prev.y,state.cols)],
-                                        val: true,
-                                        type: "path"
-                                    }
-                                }
-                                prev = cameFrom[getIndex(prev.x,prev.y,state.cols)];
-                            }
-                            return {...square};
-                        }
-                        return {...square};
-                    }
-                    return {...square};
-                })
-            
-            });
-
-            console.log("PATH FOUND!!!!!");
-            return states;
-        }
-
-        const neighbors = getNeighbors(current, rows, cols, node, cutCorners, allowDiags);
-
-        // console.log(neighbors)
-        neighbors.map((neighbor) => {
-            // console.log(neighbor);
-
-            const currentDist = node[getIndex(current.getPoint().x, current.getPoint().y, cols)].dist + dist(current, neighbor);
-
-            if(currentDist < node[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist){
-
-                node[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist = currentDist;
-                
-                cameFrom[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)] = current.getPoint();
-
-                heap.decreaseKey(neighbor, node[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist);
-
+        if(current.getPoint().type !== "wall"){
+            if(cameFrom[getIndex(current.getPoint().x, current.getPoint().y, cols)] || (current.getPoint().x === startPoint.x && current.getPoint().y === startPoint.y)){
                 const newState = {
                     ...memState,
                     grid: memState.grid.map((square, index) => {
-                        if(neighbor.getPoint().x === square.x && neighbor.getPoint().y === square.y){
-                            if(neighbor.getPoint().type !== "start" && neighbor.getPoint().type !== "end"){
+                        if(current.getPoint().x === square.x && current.getPoint().y === square.y){
+                            if(current.getPoint().type !== "start" && current.getPoint().type !== "end"){
                                 memState.grid[index] = {
                                     ...memState.grid[index],
                                     val: true,
-                                    type: "openset"
+                                    type: "neighbors"
                                 }
                             }
                             return {...square}
@@ -277,13 +302,91 @@ function Dijkstra(rows, cols, gridMap, memState, setState, cutCorners, allowDiag
                         return {...square}
                     })
                 }
-                states.push(newState); 
+                states.push(newState);
+            }
+
+        
+            if(current.getPoint().x === goal.x && current.getPoint().y === goal.y){
+                if(!cameFrom[getIndex(current.getPoint().x, current.getPoint().y, cols)]){
+                    console.log("NO PATH FOUND");
+
+                    return states
+                }
+
+                const state = states[states.length-1];
+                setState({
+                    // return {
+                    ...state,
+                    //state object is immutable so updates have to be done this way
+                    grid: state.grid.map((square, index) => {
+                        if(cameFrom[index]){
+                            if(square.type === "end"){
+                                let prev = cameFrom[index];
+                    
+                                while(prev){                   
+                                    if(prev.type !== "start" && prev.type !== "end"){
+                                        state.grid[getIndex(prev.x,prev.y,state.cols)] = {
+                                            ...state.grid[getIndex(prev.x,prev.y,state.cols)],
+                                            val: true,
+                                            type: "path"
+                                        }
+                                    }
+                                    prev = cameFrom[getIndex(prev.x,prev.y,state.cols)];
+                                }
+                                return {...square};
+                            }
+                            return {...square};
+                        }
+                        return {...square};
+                    })
+                
+                });
+
+                console.log("PATH FOUND!!!!!");
+                return states;
+            }
+
+        
+            const neighbors = getNeighbors(current, rows, cols, node, cutCorners, allowDiags);
+
+            // console.log(neighbors)
+            neighbors.map((neighbor) => {
+                // console.log(neighbor);
+
+                const currentDist = node[getIndex(current.getPoint().x, current.getPoint().y, cols)].dist + dist(current, neighbor);
+
+                if(currentDist < node[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist){
+
+                    node[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist = currentDist;
+                    
+                    cameFrom[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)] = current.getPoint();
+
+                    heap.decreaseKey(neighbor, node[getIndex(neighbor.getPoint().x, neighbor.getPoint().y, cols)].dist);
+
+                    const newState = {
+                        ...memState,
+                        grid: memState.grid.map((square, index) => {
+                            if(neighbor.getPoint().x === square.x && neighbor.getPoint().y === square.y){
+                                if(neighbor.getPoint().type !== "start" && neighbor.getPoint().type !== "end"){
+                                    memState.grid[index] = {
+                                        ...memState.grid[index],
+                                        val: true,
+                                        type: "openset"
+                                    }
+                                }
+                                return {...square}
+                            }
+                            return {...square}
+                        })
+                    }
+                    states.push(newState); 
+
+                    return null;
+                } 
 
                 return null;
-            } 
-
-            return null;
-        })
+            })
+        }
     }
     
     return states;

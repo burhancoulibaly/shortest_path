@@ -164,7 +164,7 @@ function Account() {
       {user &&
         <h1 className="username">{user.username}</h1>
       }
-      <h1 class="maps-header">Maps</h1>
+      <h1 className="maps-header">Maps</h1>
       <div className="links-container">
       {maps && 
         maps.map((map, index) => {

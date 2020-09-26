@@ -1,67 +1,70 @@
-.sb-menu{
-    height: 100%;
-    background-color: gray;
+#sb-menu{
     display: flex;
-    flex-direction: column;
+    /* flex-direction: column; */
     justify-content: center;
     align-items: center;
     padding: 2rem 0;
+    min-height: 430px;
 }
-.sb-menu-container{
+#sb-menu .sb-menu-container{
+    height: 100%;
+    min-width: 345px;
+    max-height: 415px;
+    min-height: 415px;
     border-radius: 15px;
     background: white;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
 }
 
-.sb-menu .sb-menu-container button.btn.btn-primary{
+#sb-menu .sb-menu-container button.btn.btn-primary{
     background-color: #eee !important;
     color: black !important;
     border-color: #eee !important;
 }
 
-.sb-menu .sb-menu-container button.btn.btn-primary.selected,
-.sb-menu .sb-menu-container button.btn.btn-primary.active,
-.sb-menu .sb-menu-container button.btn.btn-primary:active,
-.sb-menu .sb-menu-container button.btn.btn-primary.hover,
-.sb-menu .sb-menu-container button.btn.btn-primary:hover,
-.sb-menu .sb-menu-container button.btn.btn-primary.focus,
-.sb-menu .sb-menu-container button.btn.btn-primary:focus{
+#sb-menu .sb-menu-container button.btn.btn-primary.selected,
+#sb-menu .sb-menu-container button.btn.btn-primary.active,
+#sb-menu .sb-menu-container button.btn.btn-primary:active,
+#sb-menu .sb-menu-container button.btn.btn-primary.hover,
+#sb-menu .sb-menu-container button.btn.btn-primary:hover,
+#sb-menu .sb-menu-container button.btn.btn-primary.focus,
+#sb-menu .sb-menu-container button.btn.btn-primary:focus{
     background-color: #ddd !important;
     color: black !important;
     border-color: #ddd !important;
     box-shadow: 0 0 0 .2rem #ddd !important;
 }
-.sb-menu .sb-menu-container .map-settings{
+#sb-menu .sb-menu-container .map-settings{
     margin-bottom: 1rem;
 }
-.sb-menu .sb-menu-container .itemType-btns,
-.sb-menu .sb-menu-container .algorithm-settings,
-.sb-menu .sb-menu-container .path-settings,
-.sb-menu .sb-menu-container .map-settings{
+#sb-menu .sb-menu-container .itemType-btns,
+#sb-menu .sb-menu-container .algorithm-settings,
+#sb-menu .sb-menu-container .path-settings,
+#sb-menu .sb-menu-container .map-settings{
     display: flex;
     justify-content: space-between;
     padding: .75rem 1rem;
 }
-.sb-menu .sb-menu-container .algorithm-settings{
+#sb-menu .sb-menu-container .algorithm-settings{
     margin: 0;
 }
-.sb-menu .sb-menu-container .algorithm-settings select:first-child{
+#sb-menu .sb-menu-container .algorithm-settings select:first-child{
     margin-right: 1rem;
 }
-.sb-menu .sb-menu-container > button:last-child{
+#sb-menu .sb-menu-container > button:last-child{
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
     padding: .50rem 0;
 }
 
-.sb-menu .sb-menu-container .map-settings .disabled{
+#sb-menu .sb-menu-container .map-settings .disabled{
     pointer-events: none;
 }
 
-.sb-menu .sb-menu-container .mapname,
-.sb-menu .sb-menu-container .editname{
+#sb-menu .sb-menu-container .mapname,
+#sb-menu .sb-menu-container .editname{
     padding: 1rem;
     width: 100%;
     text-align: center;
@@ -83,4 +86,18 @@
     color: black !important;
     border-color: #ddd !important;
     box-shadow: 0 0 0 .2rem #ddd !important;
+}
+
+@media screen and (max-width: 465px) {
+    #sb-menu .sb-menu-container .algorithm-settings{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #sb-menu .sb-menu-container .algorithm-settings select:first-child{
+        margin-right: 0rem;
+        margin-bottom: 1rem;
+    }
 }

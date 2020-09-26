@@ -198,7 +198,7 @@ function Map(props) {
                 }
                 
                 if(editMapData){
-                    // console.log(editMapData);
+                    console.log(editMapData);
                     const currentMapName = menuState.mapName[menuState.mapName.length-1];
                     const map = Array.from(state.grid);
 
@@ -238,7 +238,7 @@ function Map(props) {
                 }
                 
                 if(saveMapData){
-                    // console.log(saveMapData);
+                    console.log(saveMapData);
                     const currentMapName = menuState.mapName[menuState.mapName.length-1];
                     const map = Array.from(state.grid);
 
@@ -282,7 +282,7 @@ function Map(props) {
                     grid: newState.grid
                 }); 
             }
-        }, 4)
+        }, 50)
     },[menuState.run])
 
     //If run menu button is clicked
@@ -384,15 +384,15 @@ function Map(props) {
             <Square
                 //Minus 4 accounts for width and height
                 width={
-                    cols > rows
-                        ? (props.winDimensions.width / cols) - 4
-                        : (props.winDimensions.width / cols) * (Math.min((props.winDimensions.width / cols),(props.winDimensions.height / rows)) / Math.max((props.winDimensions.width / cols),(props.winDimensions.height / rows))) - 4 
+                    Math.floor(props.winDimensions.width / cols) < Math.floor(props.winDimensions.height / rows)
+                        ? Math.floor((props.winDimensions.width) / cols)-4
+                        : (Math.floor(props.winDimensions.width / cols)-4) * (Math.floor(props.winDimensions.height / rows)-4) / (Math.floor(props.winDimensions.width / cols)-4)
                 }
                 height={
-                    rows === cols
-                        ? (props.winDimensions.height / rows) - 4
+                    Math.floor(props.winDimensions.height / rows) < Math.floor(props.winDimensions.width / cols)
+                        ? Math.floor(props.winDimensions.height / rows)-4
                         //converting aspect ration of the square to 1:1 by multiplying the height by minimum of the width and height divided by the maximum of the width and height
-                        : (props.winDimensions.height / rows) * (Math.min((props.winDimensions.width / cols),(props.winDimensions.height / rows)) / Math.max((props.winDimensions.width / cols),(props.winDimensions.height / rows))) - 4
+                        : (Math.floor(props.winDimensions.height / rows)-4) * (Math.floor(props.winDimensions.width / cols)-4) / (Math.floor(props.winDimensions.height / rows)-4)
                 }
                 x={x}
                 y={y}

@@ -127,7 +127,7 @@ function  SaveMap({mapName, dispatch, ...props}){
     const [modalShow, setModalShow] = React.useState(false);
 
     const handleShow = () => {
-        // console.log(mapName)
+        console.log(mapName)
         if(mapName.length > 0){
             dispatch({type: "save"});
         }else{
@@ -199,7 +199,7 @@ function Menu({initialState, ...props}){
     const {menuState, dispatch} = useContext(MenuContext);
 
     return (
-        <div className="sb-menu">
+        <div id="sb-menu">
             <div className="sb-menu-container">
                 <div>
                     { user &&
