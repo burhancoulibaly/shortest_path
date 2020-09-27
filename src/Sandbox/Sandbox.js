@@ -68,7 +68,7 @@ function reducer(menuState, action){
 }
 
 function Sandbox(props) {
-    const [winDimensions, setWinDimensions] = useState({ width: document.getElementById("map").offsetWidth, height: document.getElementById("map").offsetHeight });
+    const [winDimensions, setWinDimensions] = useState({ width: document.documentElement.clientWidth, height: document.documentElement.clientHeight });
 
     const initialState = {
         itemState: "start",
