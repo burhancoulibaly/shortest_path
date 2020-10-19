@@ -9,8 +9,6 @@ class FibonacciHeap{
     }
 
     insert = (node) => {
-        node.setParent(null);
-
         this._rootList.push(node);
 
         if(this._rootList.length > 1){
@@ -27,7 +25,7 @@ class FibonacciHeap{
             node1.setLeft(node1);
         }
         
-        if(this._min === null || node.getVal() < this._min.getVal()){
+        if(!this._min || this._min.getVal() >= node.getVal()){
             this._min = node;
         }
     }
@@ -40,6 +38,12 @@ class FibonacciHeap{
         const min = this._min;
 
         if(min){
+            if(min === min.getRight()){
+                this._min = null;
+            }else{
+                this._min = min.getRight()
+            }
+            
             if(min.getChild()){
                 min.getChild().forEach((node) => {
                     node.setParent(null);
@@ -48,65 +52,54 @@ class FibonacciHeap{
                 })
             }
 
-            if(min === min.getRight()){
-                this._min = null;
-            }else{
-                this._min = min.getRight()
-            }
-
             this._rootList.forEach((node, index) => {
                 if(node === min){
+                    if(this._min){
+                        this._min.setLeft(min.getLeft());
+                        min.getLeft().setRight(this._min);
+                    }
+
                     this._rootList.splice(index, 1);
                 }
                 return;
             })
 
-        }
+            this.consolidate();
 
-        this.consolidate();
+        }
 
         return min;
     }
 
     link = (node1, node2) => {
-        this._rootList.forEach((node, index) => {
-            if(node2 === node){
-                node1.setParent(null);
-                node1.setLeft(null);
-                node1.setRight(null);
-                
-                if(node1.getChild() === null){
-                    node1.setChild([]);
-                }
+        if(node1.getChild() === null){
+            node1.setChild([]);
+        }
 
-                node1.getChild().push(node2);
-                
-                if(node1.getChild().length > 1){
-                    const child1 = node1.getChild()[node1.getChild().length-2];
-                    const child2 = node1.getChild()[node1.getChild().length-1];
+        node1.getChild().push(node2);
+        
+        if(node1.getChild().length > 1){
+            const child1 = node1.getChild()[node1.getChild().length-2];
+            const child2 = node1.getChild()[node1.getChild().length-1];
 
-                    child2.setRight(child1.getRight());
-                    child1.getRight().setLeft(child2);
-                    child1.setRight(child2);
-                    child2.setLeft(child1);
-                    child2.setParent(child1.getParent());
+            child2.setRight(child1.getRight());
+            child1.getRight().setLeft(child2);
+            child1.setRight(child2);
+            child2.setLeft(child1);
+            child2.setParent(child1.getParent());
 
-                    child2.setIsMarked(false);
-                }else{
-                    const child1 = node1.getChild()[node1.getChild().length-1];
-                    
-                    child1.setRight(child1);
-                    child1.setLeft(child1);
-                    child1.setParent(node1);
+            child2.setIsMarked(false);
+        }else{
+            const child1 = node1.getChild()[node1.getChild().length-1];
+            
+            child1.setRight(child1);
+            child1.setLeft(child1);
+            child1.setParent(node1);
 
-                    child1.setIsMarked(false);
-                }
+            child1.setIsMarked(false);
+        }
 
-                node1.incrementDegree();
-            }
-
-            return null;
-        });
+        node1.incrementDegree();
 
         return node1;
     }
@@ -117,11 +110,19 @@ class FibonacciHeap{
         this._rootList.forEach((node, index) => {
             let node1 = node;
 
+            node1.setParent(null);
+            node1.setLeft(null);
+            node1.setRight(null);
+
             let degree = node1.getDegree();
 
             //degree is being used as an index
             while(arr[degree]){
                 let node2 = arr[degree];
+                
+                node2.setParent(null);
+                node2.setLeft(null);
+                node2.setRight(null);
 
                 if(node1.getVal() > node2.getVal()){
                     const tmpNode = node1;
@@ -132,11 +133,11 @@ class FibonacciHeap{
 
                 node1 = this.link(node1, node2);
 
-                arr[degree] = undefined;
+                arr[degree] = null;
 
                 degree += 1;
             }
-            
+
             arr[degree] = node1;
         })
 
@@ -145,10 +146,6 @@ class FibonacciHeap{
         arr.forEach((node, index) => {
             if(node){
                 this.insert(node);
-
-                if(this._min === null || node.getVal() <= this._min.getVal()){
-                    this._min = node;
-                }
             }
         })
     }
@@ -236,4 +233,3 @@ class FibonacciHeap{
 }
 
 export default FibonacciHeap;
-
