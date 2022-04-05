@@ -14,7 +14,7 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-d
 import UserContext from './UserContext';
 import RouteGuard from './RouteGuard';
 
-const url = !process.env.NODE_ENV || process.env.NODE_ENV === 'development' ? "http://localhost:3000/" : "https://shortestpathbackend.herokuapp.com/";
+const url = process.env.IS_HEROKU && process.env.IS_HEROKU === 'TRUE' ? "https://shortestpathbackend.herokuapp.com/" : "http://localhost:3000/";
 
 //Update user
 const updateUser = (userData, setUser) => {
