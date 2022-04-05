@@ -18,7 +18,7 @@
     "react-scripts": "^5.0.0"
   },
   "scripts": {
-    "start": "PORT=4200 --max_old_space_size=2048 react-scripts start",
+    "start": "PORT=4200 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
