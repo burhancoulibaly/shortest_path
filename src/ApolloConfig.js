@@ -1,6 +1,6 @@
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
-
+console.log(process.env.IS_HEROKU)
 const url = process.env.IS_HEROKU && process.env.IS_HEROKU === 'TRUE' ? "https://shortestpathbackend.herokuapp.com/" : "http://localhost:3000/";
 
 const httpLink = createHttpLink({ 
