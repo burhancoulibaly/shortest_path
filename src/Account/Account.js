@@ -180,28 +180,6 @@ function Account() {
                     </div>
                   </Link>
                 </div>
-                <div className="top-users">
-                  <div className="title">
-                    Top 3 Users
-                  </div>
-                  <ol>
-                    {map.highest_score &&
-                      <li>
-                        {map.highest_score}
-                      </li>
-                    }
-                    {map.second_highest_score &&
-                      <li>
-                        {map.second_highest_score}
-                      </li>
-                    }
-                    {map.third_highest_score &&
-                      <li>
-                        {map.third_highest_score}
-                      </li>
-                    }
-                  </ol>
-                </div>
                 { user.username === map.owner &&
                   <div className="map-edit">
                     { user &&
